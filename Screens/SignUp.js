@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, TextInput, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, Alert } from 'react-native';
+import { TouchableOpacity, TextInput, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, Alert, KeyboardAvoidingView } from 'react-native';
 import WavyBackground from '../Background/WavyBackground';
 import { useNavigation } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -22,11 +22,39 @@ export default function SignUp () {
   const navigation = useNavigation();
   const cityList = [
     { label: 'Islamabad', value: 'Islamabad' },
-    { label: 'Multan', value: 'Multan' },
+    { label: 'Rawalpindi', value: 'Rawalpindi' },
     { label: 'Lahore', value: 'Lahore' },
-    { label: 'Karachi', value: 'Karachi' },
+    { label: 'Multan', value: 'Multan' },
     { label: 'Faisalabad', value: 'Faisalabad' },
-  ];
+    { label: 'Karachi', value: 'Karachi' },
+    { label: 'Hyderabad', value: 'Hyderabad' },
+    { label: 'Peshawar', value: 'Peshawar' },
+    { label: 'Quetta', value: 'Quetta' },
+    { label: 'Sialkot', value: 'Sialkot' },
+    { label: 'Gujranwala', value: 'Gujranwala' },
+    { label: 'Sargodha', value: 'Sargodha' },
+    { label: 'Bahawalpur', value: 'Bahawalpur' },
+    { label: 'Sukkur', value: 'Sukkur' },
+    { label: 'Abbottabad', value: 'Abbottabad' },
+    { label: 'Mardan', value: 'Mardan' },
+    { label: 'Mingora', value: 'Mingora' },
+    { label: 'Chitral', value: 'Chitral' },
+    { label: 'Muzaffarabad', value: 'Muzaffarabad' },
+    { label: 'Gilgit', value: 'Gilgit' },
+    { label: 'Skardu', value: 'Skardu' },
+    { label: 'Mirpur', value: 'Mirpur' },
+    { label: 'Gujrat', value: 'Gujrat' },
+    { label: 'Jhelum', value: 'Jhelum' },
+    { label: 'Sahiwal', value: 'Sahiwal' },
+    { label: 'Rahim Yar Khan', value: 'Rahim Yar Khan' },
+    { label: 'Dera Ghazi Khan', value: 'Dera Ghazi Khan' },
+    { label: 'Nawabshah', value: 'Nawabshah' },
+    { label: 'Larkana', value: 'Larkana' },
+    { label: 'Khuzdar', value: 'Khuzdar' },
+    { label: 'Gwadar', value: 'Gwadar' },
+    { label: 'Zhob', value: 'Zhob' },
+    { label: 'Chaman', value: 'Chaman' },
+  ];  
   
   const provinceList = [
     { label: 'Punjab', value: 'Punjab'},
@@ -36,22 +64,33 @@ export default function SignUp () {
     {  label: 'Balochistan', value: 'Balochistan'},
     {  label: 'Gilgit Baltistan', value: 'Gilgit Baltistan'}, 
       ];
-  const [data, setData] = useState();
+  const [dobData, setDobData] = useState('Select Date of Birth');
       const saveMember = async () => {
         if (
-          fname.trim() &&
-          phoneNo.trim() &&
-          province.trim() &&
-          city.trim() &&
-          address.trim() &&
-          password.trim() &&
-          confirmPassword.trim()
+          !fname ||
+          !phoneNo||
+          !province||
+          !city||
+          !address||
+          !password||
+          !confirmPassword
         ) {
-          if (phoneNo.length !== 13) {
+        Alert.alert('Please Fill All Fields!')
+        return;
+        }
+          if (phoneNo.length != 11 ) {
             Alert.alert('Invalid Phone Number', 'Phone number must be 13 characters long.');
+          return;
+          }
+          if(password.length !=6 || confirmPassword.length !=6)
+          {
+            Alert.alert('Password should be Atleast 6 Characters')
+            return;
+          }
           if (password !== confirmPassword) {
             Alert.alert('Passwords Do Not Match');
-          } else {
+            return;
+          }
             try {
               const response = await fetch(`${baseURL}Account/SignUp`, {
                 method: 'POST',
@@ -69,7 +108,6 @@ export default function SignUp () {
                   Password: password,
                   User_Type: "Resident",
                   Date_joined: new Date().toISOString(), // Changed Date.now to ISO string
-                  Council_id: "0",
                 }),
               });
         
@@ -90,11 +128,6 @@ export default function SignUp () {
               Alert.alert('Error', 'An error occurred');
               console.log('Error:', error); // Log error for debugging
             }
-          }
-        }
-        } else {
-          Alert.alert('Please Enter your Credentials!');
-        }
       };
       
   return (
@@ -105,8 +138,8 @@ export default function SignUp () {
       <View style={styles.textContainer}>
         <Text style={styles.header}>Sign Up to Join Neighborhood</Text>
         <Text style={styles.header}>Council</Text>
-        
         <TextInput style={styles.input} placeholder="Enter Full Name" keyboardType="default" onChangeText={setFname} placeholderTextColor="#000" />
+        <TextInput style={styles.input} placeholder="Phone No" keyboardType="phone-pad" onChangeText={setPhoneNo} placeholderTextColor="#000" />
         <Text style={styles.radioText }> Gender   </Text>
         <View style={{marginBottom: 10,justifyContent:'center', flexDirection: 'row' }} >
       <TouchableOpacity onPress={() => setGender('M')}>
@@ -117,9 +150,8 @@ export default function SignUp () {
         <Text style={{color: 'black'}}>     Female   {gender === 'F' ? '●' : '○'} </Text>
       </TouchableOpacity>
     </View>
-        <TextInput style={styles.input} placeholder="Phone No" keyboardType="phone-pad" onChangeText={setPhoneNo} placeholderTextColor="#000" />
         <TouchableOpacity style={styles.dobButton} onPress={() => setOpen(true)} >
-          <Text style={styles.signUpButtonText} >Select Date of Birth</Text>
+          <Text style={styles.signUpButtonText} >{dobData}</Text>
         </TouchableOpacity>
       <DatePicker
         modal
@@ -129,12 +161,12 @@ export default function SignUp () {
         onConfirm={(dob) => {
           setOpen(false);
           setDob(dob);
+          setDobData(dob.toDateString())
         }}
         onCancel={() => {
           setOpen(false);
         }}
       />
-      <Text style={{color:'black'}}>Date of Birth: {dob.toDateString()}</Text>
        <View style={{flexDirection:'row'}}>
         <Dropdown
           data={cityList}
@@ -166,7 +198,7 @@ export default function SignUp () {
             }}
             renderItem={(item) => (
               <ScrollView>
-              <Text style={{ color: 'black' }}>{item.label}</Text>
+              <Text style={{ color: 'black'}}>{item.label}</Text>
               </ScrollView>
             )}
             selectedTextStyle={{ color: 'black' }} // Ensures the selected text is black
@@ -186,15 +218,17 @@ export default function SignUp () {
         </TouchableOpacity>
       </View>
       </ScrollView>
+      <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.keyboardAvoidingView}>
       <View style={styles.footerContainer}>
-       
-      </View>
       <Image
           source={require('../Assets/Footer.png')}
           style={[styles.footer, { width: width }]} // image width to screen width
           resizeMode="contain" // Maintain aspect ratio
         />
-  
+      </View>
+  </KeyboardAvoidingView>
     </SafeAreaView>
   
   );
@@ -202,11 +236,15 @@ export default function SignUp () {
 
 
 const styles = StyleSheet.create({
+  
+  
     textContainer:{
+      top : 10,
      flex : 1,
      alignItems : 'center',
      position : 'relative',
-     justifyContent : 'center'
+     justifyContent : 'center',
+     bottom : 10,
     },
     input: {
       width: '80%',
@@ -228,15 +266,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF', // Set the background color to white
   },
   footerContainer: {
-   
     position: 'absolute',
     bottom: 0, 
     width: '100%',
     alignItems: 'center',
+    zIndex: -1,
   },
-  footer: {
-    
-    height: 100,
+  footer : { 
+   
   },
   signUpButton: {
     width: '80%',
@@ -272,11 +309,14 @@ dropDown :{
   backgroundColor: '#F8F9FA',
   marginBottom: 10,
   placeholderTextColor : 'black',
+  fontSize: 5
 },
-dobButton : {    width: '80%',
+dobButton : {    
+  width: '80%',
   padding: 15,
   borderRadius: 25,
   backgroundColor: '#F8F9FA',
   alignItems: 'center',
-}
+  marginBottom : 10
+  }
 });

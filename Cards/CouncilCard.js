@@ -19,7 +19,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
     width: Dimensions.get('window').width - 70, 
-    backgroundColor : '#594116',
-  
+    backgroundColor : '#594116'
   },
 });

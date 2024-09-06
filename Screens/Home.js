@@ -126,27 +126,63 @@
 //   }
 // });
 import React, { useEffect, useState } from 'react';
-import { FlatList, Alert, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { FlatList, Alert, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, Button } from 'react-native';
 import WavyBackground from '../Background/WavyBackground';
 import { FAB } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CouncilCard from '../Cards/CouncilCard';
-
-export default function HomeScreen({ navigation }) {
+import JoinCouncil from './JoinCouncilScreen';
+  
+export default function HomeScreen({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
   const [councilData, setCouncilData] = useState([]);
+  const { memberID } = route.params;
+  const [memberId, setMemberId] = useState(null);
+  const [name , setName] = useState('');
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await getUserData();
+      if (userData && userData.memberId && userData.fullName) {
+        setMemberId(userData.memberId);
+        setName(userData.fullName)
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const getUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('userData');
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  };
+  
 
   useEffect(() => {
     const GetCouncils = async () => {
       try {
-        const response = await fetch(`${baseURL}Council/getCouncils`);
+        const response = await fetch(`${baseURL}Council/GetCouncils?memberId=${memberID}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         if (response.ok) {
           const json = await response.json();
+          console.log('Councils Loaded')
           setCouncilData(json);
-        } else {
+        } else if(response.status === 400){
+          const errorText = await response.text();
+          console.log('No Councils found'+errorText);
+          Alert.alert('No Councils found');
+        }
+        else{
           const errorText = await response.text();
           console.error('Failed to load Data:', errorText);
-          Alert.alert('Error', 'Failed to load Data');
+          Alert.alert('Error', 'Failed to load Data'+ response.status);  
         }
       } catch (error) {
         console.error('Error loading Data:', error);
@@ -155,6 +191,7 @@ export default function HomeScreen({ navigation }) {
     };
     GetCouncils(); // Call the function
   }, []);
+
 
   const handlePress = async () => {
     try {
@@ -172,12 +209,27 @@ export default function HomeScreen({ navigation }) {
       <CouncilCard council={item} navigation={navigation} />
     </View>
   );
+ 
 
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await AsyncStorage.getItem('userData');
+      if (userData && userData.memberId) {
+        setMemberId(userData.memberId);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+  
+  
   return (
     <SafeAreaView style={styles.container}>
       <WavyBackground />
       <Text style={styles.text}>Neighborhood</Text>
       <Text style={styles.text}>Council</Text>
+      <Text style={styles.text}>Id : {memberId} </Text>
       <View style={styles.contentContainer}>
         <FlatList
           data={councilData}
@@ -186,11 +238,12 @@ export default function HomeScreen({ navigation }) {
           contentContainerStyle={styles.listContent}
         />
       </View>
+      <Button title='Logout' onPress={handlePress}></Button>
       <FAB
         icon="plus"
         style={styles.fab}
         color="#fff"
-        onPress={() => {/* Handle FAB press */}}
+        onPress={()=>(navigation.navigate('JoinCouncil', {memberID : memberId}))}
       />
       <View style={styles.footerContainer}>
         <Image

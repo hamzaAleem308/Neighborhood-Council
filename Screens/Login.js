@@ -4,6 +4,8 @@ import WavyBackground from '../Background/WavyBackground';
 import  baseURL  from './Api';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoadingScreen from './LoadingScreen';
+import HomeScreen from './Home';
 
 export default function Login({}){
   const [phoneNo, setPhoneNo] = useState('');
@@ -11,39 +13,125 @@ export default function Login({}){
   const [data, setData] =useState();
   const navigation= useNavigation();
 
-  const handlePress = async () => {
-    if(phoneNo.trim()&&password.trim()){
-    try {
-      let response = await fetch(`${baseURL}Account/Login?phoneNo=${phoneNo}&password=${password}`);
+  // const storeUserData = async (userData) => {
+  //   try {
+  //     await AsyncStorage.setItem('userToken', JSON.stringify(userData));
+  //   } catch (error) {
+  //     console.error('Failed to save user data:', error);
+  //   }
+  // };
+
+
+  // const handlePress = async () => {
+  //   if(phoneNo.trim()&&password.trim()){
+  //   try {
+  //     let response = await fetch(`${baseURL}Account/Login?phoneNo=${phoneNo}&password=${password}`);
   
-      let json = await response.json();
-      setData(json);
-      console.log('Response status:', response.status);
-      const token = 'LoggedIn'; //User Token to Check If logged in.
-      await AsyncStorage.setItem('userToken', token);
-      console.log('Token saved' + token)
-      if (response.ok) {
-        Alert.alert(
-          'Welcome to the Portal',  
-          `${data}`,             
-          [
-            { text: 'OK', onPress: () => navigation.navigate('HomeScreen') }
-          ]
-        );
-      }
-      else {
-        Alert.alert('Error', 'No Member Registered with ' + phoneNo);
+  //     let json = await response.json();
+  //     setData(json);
+  //     console.log('Response status:', response.status);
+  //     const token = 'LoggedIn'; //User Token to Check If logged in.
+  //     await AsyncStorage.setItem('userToken', token);
+  //     console.log('Token saved' + token)
+  //     if (response.ok) {
+  //       const userData = {
+  //   memberId: response.id,
+  //   // Other user data
+  // };
+  // await storeUserData(userData);
+  // console.log('Stored Id:  '+ userData.memberId)
+  //       Alert.alert(
+  //         'Welcome to the Portal',  
+  //         `${data.Full_Name}`,             
+  //         [
+  //           { text: 'OK', onPress: () => navigation.navigate('HomeScreen')}
+  //         ]
+  //       );
+  //     }
+  //     else {
+  //       Alert.alert('Error', 'No Member Registered with ' + phoneNo);
         
+  //     }
+  //   } catch (error) {
+  //     Alert.alert('Error' , JSON.stringify(error));
+  //     Alert.alert('Error', 'Failed to save the token');
+  //   }
+  // }else{
+  //   Alert.alert('Please Enter your Credentials!')
+  // }
+  // };
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem('userToken');
+        setIsLoggedIn(token !== null);
+      } catch (error) {
+        console.error('Failed to fetch token from storage:', error);
       }
-    } catch (error) {
-      Alert.alert('Error' , JSON.stringify(error));
-      Alert.alert('Error', 'Failed to save the token');
-    }
-  }else{
-    Alert.alert('Please Enter your Credentials!')
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  if (isLoggedIn === null) {
+    return <LoadingScreen />;
   }
+
+  isLoggedIn ? (
+    <HomeScreen navigation={navigation} />
+  ) : (
+    <Login navigation={navigation} />
+  );
+
+  const storeUserData = async (userData) => {
+    try {
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+    } catch (error) {
+      console.error('Failed to save user data:', error);
+    }
   };
 
+  const handlePress = async () => {
+    if (phoneNo.trim() && password.trim()) {
+      try {
+        const response = await fetch(`${baseURL}Account/Login?phoneNo=${phoneNo}&password=${password}`);
+        const json = await response.json();
+
+        console.log('Response status:', response.status);
+
+        if (response.ok) {
+          const userData = {
+            memberId: json.id, // Assuming `json` contains the `id`
+            fullName: json.Full_Name,
+            // Other user data
+          };
+          await storeUserData(userData);
+          console.log('Stored Id: ' + userData.memberId);
+
+          await AsyncStorage.setItem('userToken', 'LoggedIn');
+          console.log('Token saved');
+
+          Alert.alert(
+            'Welcome to the Portal',
+            `${userData.fullName}`,
+            [{ text: 'OK', onPress: () => navigation.navigate('HomeScreen',{ memberID : userData.memberId}) }]
+          );
+        } else if(response.status === 401) {
+          Alert.alert('Error', 'Incorrect Password');
+        }
+        else{
+          Alert.alert('Error', 'No Member Registered with ' + phoneNo);
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        Alert.alert('Error', 'Failed to log in. Please try again later.');
+      }
+    } else {
+      Alert.alert('Please Enter your Credentials!');
+    }
+  };
   return (
     <View style={styles.container}>
       <WavyBackground/>
