@@ -1,17 +1,74 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Title, Paragraph } from 'react-native-paper';
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function CouncilCard({ council, navigation }) {
+export default function CouncilCard({ route, council, navigation }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const[memberId, setMemberId] = useState(null);
+  //const { member } = route.params;
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await getUserData();
+      if (userData && userData.memberId && userData.fullName) {
+        setMemberId(userData.memberId);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const getUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('userData');
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  };
+  
+
+  const checkUserType = async () => {
+    try {
+      const response = await fetch(`${baseURL}Council/GetUserType?memberId=${memberId}&councilId=${council.id}`);
+      const role = await response.json();
+      console.log(memberId)
+      if (response.ok) {
+        switch (role) {
+          case 'Admin':
+            navigation.replace('AdminScreen');
+            break;
+          case 'Member':
+            navigation.replace('ResidentScreen');
+            break;
+          default:
+            Alert.alert('Error', 'Unknown role.');
+        }
+      } else { 
+        Alert.alert('Error', 'Failed to retrieve user type.');
+      }
+    } catch (error) {
+      console.error('Error checking user type:', error);
+      Alert.alert('Error', 'An error occurred while checking user type.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // useEffect(() => {
+  //   checkUserType();
+  // }, [navigation]);
+
   return (
-    <Card style={styles.card} onPress={() => console.log('Pressedd')} >
+    <Card style={styles.card} onPress={checkUserType}>
       <Card.Content>
         <Title>{council.Name}</Title>
-        <Paragraph>Click to view Details</Paragraph>
+        <Paragraph>Click to view Details {memberId}</Paragraph>
       </Card.Content>
     </Card>
   );
 }
+
 //onPress={() => navigation.navigate('Table', { council: council.id })}
 
 const styles = StyleSheet.create({

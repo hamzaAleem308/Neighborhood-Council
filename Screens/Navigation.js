@@ -75,6 +75,9 @@ import SignUp from './SignUp'; // Replace with your actual SignUp component
 import HomeScreen from './Home'; // Replace with your actual HomeScreen component
 import JoinCouncil from './JoinCouncilScreen'; // Replace with your actual JoinCouncil component
 import CreateCouncil from './CreateCouncil'; // Replace with your actual CreateCouncil component
+import AdminScreen from './AdminScreen';
+import ResidentScreen from './ResidentScreen';
+import CommitteeMemberScreen from './CommitteeMemberScreen';
 
 const Stack = createStackNavigator();
 
@@ -94,6 +97,10 @@ export default function App() {
       <Stack.Screen name="JoinCouncil" component={JoinCouncil} options={{headerTransparent: true, headerTitleAlign: 'center',}}/>
       <Stack.Screen name="CreateCouncil" component={CreateCouncil} options={{headerTransparent: true, headerTitleAlign: 'center',}}/>
       <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }}/>
+      <Stack.Screen name="AdminScreen" component={AdminScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="ResidentScreen" component={ResidentScreen} options={{ headerShown: false }}/>
+      <Stack.Screen name="CommitteeMemberScreen" component={CommitteeMemberScreen} options={{ headerShown: false }}/>
+      
       </Stack.Navigator>
       {/* <Stack.Navigator>
         <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />

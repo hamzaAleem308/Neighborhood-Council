@@ -21,7 +21,7 @@ export default function SplashScreen()  {
         </View>
       <View style={styles.footerContainer}>
         <Image
-          source={require('../Assets/Footer.png')}
+          source={require('../assets/Footer.png')}
           style={[styles.footer, { width: width }]} //image width to screen width
           resizeMode="contain" // Maintain aspect ratio
         />

@@ -10,7 +10,7 @@ import HomeScreen from './Home';
 export default function Login({}){
   const [phoneNo, setPhoneNo] = useState('');
   const [password, setPassword] = useState('');
-  const [data, setData] =useState();
+
   const navigation= useNavigation();
 
   // const storeUserData = async (userData) => {
@@ -77,7 +77,7 @@ export default function Login({}){
 
   if (isLoggedIn === null) {
     return <LoadingScreen />;
-  }
+   }
 
   isLoggedIn ? (
     <HomeScreen navigation={navigation} />
@@ -137,8 +137,7 @@ export default function Login({}){
       <WavyBackground/>
       <View style={styles.logoContainer}>
           <View style={styles.logo}>
-            {/* Icon placeholder */}
-            <Image source={require('../Assets/UserProfile.png')} style={styles.image}></Image>
+            <Image source={require('../assets/UserProfile.png')} style={styles.image}></Image>
           </View>
         </View>
         <View>
@@ -159,7 +158,7 @@ export default function Login({}){
           </Text>
         </TouchableOpacity>
         <View style={styles.footer}>
-      <Image source={require('../Assets/Footer.png')}></Image>
+      <Image source={require('../assets/Footer.png')}></Image>
       {/* Footer content */}
     </View>
     </View> 

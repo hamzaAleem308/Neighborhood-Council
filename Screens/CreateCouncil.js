@@ -34,7 +34,8 @@ export default function CreateCouncil({ route, navigation }) {
           
         if (response.ok) {
             console.log(JSON.stringify(json));
-            Alert.alert('Council added successfully!', 'Now you will be redirected to Home.', [{ text: 'OK', onPress: () => navigation.navigate('HomeScreen')}]);
+            Alert.alert('Council added successfully!', 'Now you will be redirected to Home.', 
+              [{ text: 'OK', onPress: () => navigation.navigate('HomeScreen', { memberID: Id })}]);
             navigation.replace('HomeScreen');
         } else {
             Alert.alert('Failed to create post.'+response.status);
@@ -51,6 +52,12 @@ export default function CreateCouncil({ route, navigation }) {
       <WavyBackground />
       
       <View style={styles.contentContainer}>
+      <View style={styles.logoContainer}>
+          <View style={styles.logo}>
+            <Image source={require('../assets/group.png')} style={styles.image}></Image>
+          </View>
+        </View>
+        <Text style={{}}>Photo ↺</Text>
         <Text style={styles.titleText}>Create Council</Text>
         {/* <Text style={styles.memberIdText}>Member ID: {Id}</Text> */}
         <TextInput style={styles.input} placeholder="Title " keyboardType="default" onChangeText={setName} placeholderTextColor="#000" />
@@ -62,7 +69,7 @@ export default function CreateCouncil({ route, navigation }) {
       </View>
 
       <View style={styles.footerContainer}>
-        <Image source={require('../Assets/Footer.png')} style={styles.footerImage}></Image>
+        <Image source={require('../assets/Footer.png')} style={styles.footerImage}></Image>
       </View>
     </SafeAreaView>
   );
@@ -75,6 +82,22 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoContainer: {
+    marginBottom: 40,
+  },
+  image : {
+    height : 150,
+    width : 150
+  },
+
+  logo: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
   },

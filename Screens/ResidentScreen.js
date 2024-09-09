@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, SafeAreaView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import WavyBackground from '../Background/WavyBackground';
 
-export default function Template () {
+export default function ResidentScreen () {
   const { width } = useWindowDimensions(); // screen width
 
   return (

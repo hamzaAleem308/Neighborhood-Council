@@ -1,20 +1,14 @@
 import React from 'react';
 import { Image, SafeAreaView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import WavyBackground from '../Background/WavyBackground';
+import Template from './BackgroundTemplate';
 
-export default function Template () {
+export default function CommitteeMemberScreen () {
   const { width } = useWindowDimensions(); // screen width
 
   return (
-    <SafeAreaView style={styles.container}>
-      <WavyBackground />
-      <View style={styles.footerContainer}>
-        <Image
-          source={require('../assets/Footer.png')}
-          style={[styles.footer, { width: width }]} // image width to screen width
-          resizeMode="contain" // Maintain aspect ratio
-        />
-      </View>
+    <SafeAreaView>
+     <Template/>
     </SafeAreaView>
   );
 };

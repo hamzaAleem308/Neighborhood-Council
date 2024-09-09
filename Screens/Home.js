@@ -64,7 +64,7 @@
 //       <FAB icon={'plus'} style={styles.fab} color='#fff' backgroundColor='#F0C38E'  />
 //       <View style={styles.footerContainer}>
 //         <Image
-//           source={require('../Assets/Footer.png')}
+//           source={require('../assets/Footer.png')}
 //           style={[styles.footer, { width: width }]} // image width to screen width
 //           resizeMode="contain" // Maintain aspect ratio
 //         />
@@ -138,19 +138,19 @@ export default function HomeScreen({ route, navigation }) {
   const [councilData, setCouncilData] = useState([]);
   const { memberID } = route.params;
   const [memberId, setMemberId] = useState(null);
-  const [name , setName] = useState('');
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const userData = await getUserData();
-      if (userData && userData.memberId && userData.fullName) {
-        setMemberId(userData.memberId);
-        setName(userData.fullName)
-      }
-    };
 
-    fetchUserData();
+  useEffect(() => {
+   
+
+   
   }, []);
 
+  const fetchUserData = async () => {
+    const userData = await getUserData();
+    if (userData && userData.memberId && userData.fullName) {
+      setMemberId(userData.memberId);
+    }
+  };
   const getUserData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('userData');
@@ -160,36 +160,36 @@ export default function HomeScreen({ route, navigation }) {
     }
   };
   
-
-  useEffect(() => {
-    const GetCouncils = async () => {
-      try {
-        const response = await fetch(`${baseURL}Council/GetCouncils?memberId=${memberID}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        if (response.ok) {
-          const json = await response.json();
-          console.log('Councils Loaded')
-          setCouncilData(json);
-        } else if(response.status === 400){
-          const errorText = await response.text();
-          console.log('No Councils found'+errorText);
-          Alert.alert('No Councils found');
-        }
-        else{
-          const errorText = await response.text();
-          console.error('Failed to load Data:', errorText);
-          Alert.alert('Error', 'Failed to load Data'+ response.status);  
-        }
-      } catch (error) {
-        console.error('Error loading Data:', error);
-        Alert.alert('Error', 'An error occurred while loading Data');
+  const GetCouncils = async () => {
+    try {
+      const response = await fetch(`${baseURL}Council/GetCouncils?memberId=${memberID}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.ok) {
+        const json = await response.json();
+        console.log('Councils Loaded')
+        setCouncilData(json);
+      } else if(response.status === 400){
+        const errorText = await response.text();
+        console.log('Invalid Request'+errorText);
+        Alert.alert('No Councils found');
       }
-    };
+      else{
+        const errorText = await response.text();
+        console.error('Failed to load Data:', errorText);
+        Alert.alert('Error', 'Failed to load Data'+ response.status);  
+      }
+    } catch (error) {
+      console.error('Error loading Data:', error);
+      Alert.alert('Error', 'An error occurred while loading Data');
+    }
+  };
+  useEffect(() => {
     GetCouncils(); // Call the function
+    fetchUserData();
   }, []);
 
 
@@ -206,7 +206,7 @@ export default function HomeScreen({ route, navigation }) {
 
   const renderCouncilCard = ({ item }) => (
     <View style={styles.cardContainer}>
-      <CouncilCard council={item} navigation={navigation} />
+      <CouncilCard council={item} navigation={navigation} member={memberId}/>
     </View>
   );
  
@@ -247,7 +247,7 @@ export default function HomeScreen({ route, navigation }) {
       />
       <View style={styles.footerContainer}>
         <Image
-          source={require('../Assets/Footer.png')}
+          source={require('../assets/Footer.png')}
           style={[styles.footer, { width: width }]}
           resizeMode="contain"
         />

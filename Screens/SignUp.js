@@ -79,10 +79,10 @@ export default function SignUp () {
         return;
         }
           if (phoneNo.length != 11 ) {
-            Alert.alert('Invalid Phone Number', 'Phone number must be 13 characters long.');
+            Alert.alert('Invalid Phone Number', 'Phone number must be 11 characters long.');
           return;
           }
-          if(password.length !=6 || confirmPassword.length !=6)
+          if(password.length <6 || confirmPassword.length <6)
           {
             Alert.alert('Password should be Atleast 6 Characters')
             return;
@@ -106,7 +106,6 @@ export default function SignUp () {
                   City: city,
                   Address: address, // Added missing address field
                   Password: password,
-                  User_Type: "Resident",
                   Date_joined: new Date().toISOString(), // Changed Date.now to ISO string
                 }),
               });
@@ -141,7 +140,7 @@ export default function SignUp () {
         <TextInput style={styles.input} placeholder="Enter Full Name" keyboardType="default" onChangeText={setFname} placeholderTextColor="#000" />
         <TextInput style={styles.input} placeholder="Phone No" keyboardType="phone-pad" onChangeText={setPhoneNo} placeholderTextColor="#000" />
         <Text style={styles.radioText }> Gender   </Text>
-        <View style={{marginBottom: 10,justifyContent:'center', flexDirection: 'row' }} >
+        <View style={{marginBottom: 10, justifyContent:'center', flexDirection: 'row' }} >
       <TouchableOpacity onPress={() => setGender('M')}>
         <Text style={{color: 'black'}}>Male   {gender === 'M' ? '●' : '○'}</Text>
       </TouchableOpacity>
@@ -223,7 +222,7 @@ export default function SignUp () {
       style={styles.keyboardAvoidingView}>
       <View style={styles.footerContainer}>
       <Image
-          source={require('../Assets/Footer.png')}
+          source={require('../assets/Footer.png')}
           style={[styles.footer, { width: width }]} // image width to screen width
           resizeMode="contain" // Maintain aspect ratio
         />
@@ -239,12 +238,12 @@ const styles = StyleSheet.create({
   
   
     textContainer:{
-      top : 10,
+      top : 0,
      flex : 1,
      alignItems : 'center',
      position : 'relative',
      justifyContent : 'center',
-     bottom : 10,
+     bottom : 0,
     },
     input: {
       width: '80%',
@@ -281,7 +280,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: '#F0C38E',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   signUpButtonText: {
     color: '#000',

@@ -24,7 +24,7 @@ export default function JoinCouncil ({route, navigation}) {
         </TouchableOpacity>
         <View style={styles.footerContainer}>
         <Image
-          source={require('../Assets/Footer.png')}
+          source={require('../assets/Footer.png')}
           style={[styles.footer, { width: width }]} // image width to screen width
           resizeMode="contain" // Maintain aspect ratio
         />
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonText: {
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
   },
   input: {
