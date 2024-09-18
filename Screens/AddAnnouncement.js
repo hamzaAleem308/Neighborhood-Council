@@ -3,23 +3,11 @@ import { Alert, Image, KeyboardAvoidingView, SafeAreaView, StyleSheet, Text, Tex
 import WavyBackground from '../Background/WavyBackground';
 import { Button } from 'react-native-paper';
 
-export default function CreateCouncil({ route, navigation }) {
+export default function AddAnnouncement({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
   const { Id } = route.params;
-  const memberId = Id
   const [name, setName]= useState('');
   const [desc,  setDesc] = useState('');
-
-  const generateJoinCode = (memberId) => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let code = memberId.toString(); // Start with the councilId as part of the code
-    for (let i = 0; i < 6; i++) { // Adjust the number of random characters as needed
-      code += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return code;
-  };
-  
-  let code = generateJoinCode(memberId);
 
   async function CreateCouncil() {
     if (!name || !desc) {
@@ -31,7 +19,6 @@ export default function CreateCouncil({ route, navigation }) {
         Name: name,
         Description: desc,
         Date: new Date().toISOString(),
-        JoinCode : code
     };
 
     try {
@@ -64,14 +51,7 @@ export default function CreateCouncil({ route, navigation }) {
       <WavyBackground />
       
       <View style={styles.contentContainer}>
-        {/* <Text style={styles.titleText}>Create Council</Text> */}
-        <View style={styles.logoContainer}>
-        <View style={styles.logo}>
-            <Image source={require('../assets/group.png')} style={styles.image}></Image>
-          </View>
-        </View>
-        <Text style={{color : 'black', marginBottom: 20}}>Photo ↺ {memberId}</Text>
-        {/* <Text style={styles.memberIdText}>Member ID: {Id}</Text> */}
+        <Text style={styles.titleText}>Add Announcements</Text>
         <TextInput style={styles.input} placeholder="Name " keyboardType="default" onChangeText={setName} placeholderTextColor="#000" />
         <TextInput style={styles.description} placeholder="Description" keyboardType="default"onChangeText={setDesc} placeholderTextColor="#000" />
         <TouchableOpacity style={styles.signInButton} onPress={CreateCouncil}>
@@ -79,9 +59,11 @@ export default function CreateCouncil({ route, navigation }) {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.footerContainer}>
-        <Image source={require('../assets/Footer.png')} style={styles.footerImage}></Image>
-      </View>
+      <Image
+        source={require('../assets/Footer.png')}
+        style={[styles.footer, { width: width }]}
+        resizeMode="stretch"
+      />
     </SafeAreaView>
   );
 };
@@ -155,15 +137,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  footerContainer: {
+  footer: {
     position: 'absolute',
     bottom: 0,
-    width: '100%',
-    alignItems: 'center',
-  },
-  footerImage: {
-    width: '100%',
-    resizeMode: 'stretch',
+    zIndex: -1,
   },
 });
 

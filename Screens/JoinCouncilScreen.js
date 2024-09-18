@@ -1,11 +1,40 @@
-import React, { useState } from 'react';
-import {Text, TouchableOpacity ,Button, Image, SafeAreaView, StyleSheet, TextInput, useWindowDimensions, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {Text, TouchableOpacity ,Button, Image, SafeAreaView, StyleSheet, TextInput, useWindowDimensions, View, Alert } from 'react-native';
 import WavyBackground from '../Background/WavyBackground';
 
 export default function JoinCouncil ({route, navigation}) {
   const { width } = useWindowDimensions(); // screen width
   const [councilLink, setCouncilLink] = useState('');
  const { memberID } = route.params;
+ 
+
+  const JoinCouncilUsingJoinCode = async () => {
+    try {
+      const response = await fetch(`${baseURL}Council/JoinCouncilUsingCode?memberId=${memberID}&joinCode=${councilLink}`, {
+        method: 'Post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.ok) {
+        const json = await response.json();
+        console.log(JSON.stringify(json));
+        Alert.alert('Council added successfully!', 'Now you will be redirected to Home.', 
+          [{ text: 'OK', onPress: () => navigation.navigate('HomeScreen', { member: memberID })}]);
+      } else if( response.status == 204) {
+        Alert.alert('No Council Found with this Join Code')
+      } 
+      else if( response.status == 409) {
+        Alert.alert('You are already a part of this council')
+      }
+      else{
+        Alert.alert('Error', 'Failed to load Data');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'No Co');
+    }
+  };
+
   const handlePress = async()=>{
     navigation.navigate('CreateCouncil',{ Id : memberID})
   }
@@ -19,14 +48,14 @@ export default function JoinCouncil ({route, navigation}) {
         </TouchableOpacity>
         <Text style={{color: 'black', textAlign : 'center', fontSize: 20 , margin:8}}>OR  </Text>
       <TextInput style={styles.input} placeholder="Paste Link Here" onChangeText={setCouncilLink} placeholderTextColor="#0007" />
-      <TouchableOpacity style={styles.button} onPress={()=>console.log('pressed')}>
+      <TouchableOpacity style={styles.button} onPress={JoinCouncilUsingJoinCode}>
           <Text style={styles.buttonText}>Join Council</Text>
         </TouchableOpacity>
         <View style={styles.footerContainer}>
         <Image
           source={require('../assets/Footer.png')}
-          style={[styles.footer, { width: width }]} // image width to screen width
-          resizeMode="contain" // Maintain aspect ratio
+          style={[{ width: width }]} // image width to screen width
+          resizeMode="stretch" // Maintain aspect ratio
         />
       </View>
     </SafeAreaView>

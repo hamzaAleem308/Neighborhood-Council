@@ -36,7 +36,7 @@ export default function CouncilCard({ route, council, navigation }) {
       if (response.ok) {
         switch (role) {
           case 'Admin':
-            navigation.replace('AdminScreen');
+            navigation.replace('AdminScreen', {Council : council.id});
             break;
           case 'Member':
             navigation.replace('ResidentScreen');
@@ -62,8 +62,8 @@ export default function CouncilCard({ route, council, navigation }) {
   return (
     <Card style={styles.card} onPress={checkUserType}>
       <Card.Content>
-        <Title>{council.Name}</Title>
-        <Paragraph>Click to view Details {memberId}</Paragraph>
+        <Title style={{ color : 'black', fontWeight : '700'}}>{council.Name}</Title>
+        <Paragraph style={{ color : 'black'}}>{council.Description}</Paragraph>
       </Card.Content>
     </Card>
   );
@@ -74,8 +74,10 @@ export default function CouncilCard({ route, council, navigation }) {
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    marginRight: 8,
-    width: Dimensions.get('window').width - 70, 
-    backgroundColor : '#594116'
+    marginRight: 2,
+    height: '80%',
+    borderRadius : 35,
+    width: Dimensions.get('window').width - 25, 
+    backgroundColor : '#eab676'
   },
 });

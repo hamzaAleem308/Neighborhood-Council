@@ -1,14 +1,21 @@
 import React from 'react';
-import { Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Button, Image, SafeAreaView, Share, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import WavyBackground from '../Background/WavyBackground';
 import { shadow, style} from 'react-native-paper';
 
 export default function SplashScreen()  {
   const { width } = useWindowDimensions(); // screen width
+  
+const shareJoinCode = (code) => {
+  Share.share({
+    message: `Join my council using this code: ${code}`,
+  });
+};
+
   return (
     <SafeAreaView style={styles.container}>
       <WavyBackground />
-      <View style = {styles.textContainer} >
+      {/* <View style = {styles.textContainer} >
       <Text style={styles.header}>
          Neighborhood
         </Text>
@@ -18,7 +25,9 @@ export default function SplashScreen()  {
         <Text  style={styles.tagline}>
          Join Hands, Solve Together, Thrive as One Community.
         </Text>
-        </View>
+        </View> */}
+      <Button onPress={shareJoinCode} title='Press Me'></Button>
+
       <View style={styles.footerContainer}>
         <Image
           source={require('../assets/Footer.png')}

@@ -1,4 +1,4 @@
-export default baseURL = "http://172.16.214.249/NcDemo/api/"
+export default baseURL = "http://192.168.43.85/NcDemo/api/"
 let baseImageURL = "http://192.168.20.198/NcDemo/Images"
 export {baseImageURL}
 

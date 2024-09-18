@@ -69,15 +69,21 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import SplashScreen from 'react-native-splash-screen';
 
-import LoadingScreen from './LoadingScreen'; // Replace with your actual loading screen component
-import Login from './Login'; // Replace with your actual Login component
-import SignUp from './SignUp'; // Replace with your actual SignUp component
-import HomeScreen from './Home'; // Replace with your actual HomeScreen component
-import JoinCouncil from './JoinCouncilScreen'; // Replace with your actual JoinCouncil component
-import CreateCouncil from './CreateCouncil'; // Replace with your actual CreateCouncil component
+import LoadingScreen from './LoadingScreen'; 
+import Login from './Login'; 
+import SignUp from './SignUp'; 
+import HomeScreen from './Home'; 
+import JoinCouncil from './JoinCouncilScreen'; 
+import CreateCouncil from './CreateCouncil'; 
 import AdminScreen from './AdminScreen';
 import ResidentScreen from './ResidentScreen';
 import CommitteeMemberScreen from './CommitteeMemberScreen';
+import AddAnnouncement from './AddAnnouncement';
+import Announcemnet from './Announcement';
+import MeetingScreen from './Meeting';
+import InviteMember from './InviteResident';
+import ScheduleMeeting from './ScheduleMeeting';
+import AdministrateElection from './AdministrateElection';
 
 const Stack = createStackNavigator();
 
@@ -97,16 +103,21 @@ export default function App() {
       <Stack.Screen name="JoinCouncil" component={JoinCouncil} options={{headerTransparent: true, headerTitleAlign: 'center',}}/>
       <Stack.Screen name="CreateCouncil" component={CreateCouncil} options={{headerTransparent: true, headerTitleAlign: 'center',}}/>
       <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }}/>
-      <Stack.Screen name="AdminScreen" component={AdminScreen} options={{ headerShown: false }}/>
-      <Stack.Screen name="ResidentScreen" component={ResidentScreen} options={{ headerShown: false }}/>
-      <Stack.Screen name="CommitteeMemberScreen" component={CommitteeMemberScreen} options={{ headerShown: false }}/>
-      
+      <Stack.Screen name="AdminScreen" component={AdminScreen} options={{ headerTransparent: true, headerTitleAlign: 'center'}}/>
+      <Stack.Screen name="ResidentScreen" component={ResidentScreen} options={{headerTransparent: true, headerTitleAlign: 'center', }}/>
+      <Stack.Screen name="CommitteeMemberScreen" component={CommitteeMemberScreen} options={{ headerTransparent: true, headerTitleAlign: 'center',  }}/>
+      <Stack.Screen name="InviteResident" component={InviteMember} options={{headerTransparent: true, headerTitleAlign: 'center', }}/>
+
       </Stack.Navigator>
       {/* <Stack.Navigator>
-        <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="InviteResident" component={InviteMember} options={{headerTransparent: true, headerTitleAlign: 'center', }}/>
+      </Stack.Navigator> */}
+      {/* <Stack.Navigator>
+        <Stack.Screen name="AdminScreen" component={AdminScreen} options={{ headerTransparent: true, headerTitleAlign: 'center'}}/>
+        {/* <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CreateCouncil" component={CreateCouncil}  options={{headerTransparent: true, headerTitleAlign: 'center',}} />
-        <Stack.Screen name="JoinCouncil" component={JoinCouncil} options={{headerTransparent: true, headerTitleAlign: 'center',}} />
-        </Stack.Navigator> */}
+        <Stack.Screen name="JoinCouncil" component={JoinCouncil} options={{headerTransparent: true, headerTitleAlign: 'center',}} /> */} 
+        {/* </Stack.Navigator> */}
     </NavigationContainer>
   );
 }

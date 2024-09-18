@@ -12,7 +12,7 @@ export default function Template () {
         <Image
           source={require('../assets/Footer.png')}
           style={[styles.footer, { width: width }]} // image width to screen width
-          resizeMode="contain" // Maintain aspect ratio
+          resizeMode="stretch" // Maintain aspect ratio
         />
       </View>
     </SafeAreaView>

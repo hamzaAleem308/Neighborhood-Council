@@ -125,32 +125,31 @@
 //     left: 20,
 //   }
 // });
-import React, { useEffect, useState } from 'react';
-import { FlatList, Alert, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, Button } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FlatList, Alert, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import WavyBackground from '../Background/WavyBackground';
 import { FAB } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CouncilCard from '../Cards/CouncilCard';
-import JoinCouncil from './JoinCouncilScreen';
-  
+import { useFocusEffect } from '@react-navigation/native';
+
 export default function HomeScreen({ route, navigation }) {
-  const { width } = useWindowDimensions(); // screen width
+  const { width } = useWindowDimensions();
   const [councilData, setCouncilData] = useState([]);
   const { memberID } = route.params;
   const [memberId, setMemberId] = useState(null);
 
   useEffect(() => {
-   
+    const fetchUserData = async () => {
+      const userData = await getUserData();
+      if (userData && userData.memberId) {
+        setMemberId(userData.memberId);
+      }
+    };
 
-   
+    fetchUserData();
   }, []);
 
-  const fetchUserData = async () => {
-    const userData = await getUserData();
-    if (userData && userData.memberId && userData.fullName) {
-      setMemberId(userData.memberId);
-    }
-  };
   const getUserData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem('userData');
@@ -159,7 +158,12 @@ export default function HomeScreen({ route, navigation }) {
       console.error('Failed to fetch user data:', error);
     }
   };
-  
+
+  // useEffect(() => {
+   
+  //   GetCouncils();
+  // }, []);
+
   const GetCouncils = async () => {
     try {
       const response = await fetch(`${baseURL}Council/GetCouncils?memberId=${memberID}`, {
@@ -170,66 +174,63 @@ export default function HomeScreen({ route, navigation }) {
       });
       if (response.ok) {
         const json = await response.json();
-        console.log('Councils Loaded')
         setCouncilData(json);
-      } else if(response.status === 400){
-        const errorText = await response.text();
-        console.log('Invalid Request'+errorText);
-        Alert.alert('No Councils found');
+      } else if( response.status == 204) {
+        Alert.alert('No Councils Found')
       }
       else{
-        const errorText = await response.text();
-        console.error('Failed to load Data:', errorText);
-        Alert.alert('Error', 'Failed to load Data'+ response.status);  
+        Alert.alert('Error', 'Failed to load Data');
       }
     } catch (error) {
-      console.error('Error loading Data:', error);
       Alert.alert('Error', 'An error occurred while loading Data');
     }
   };
-  useEffect(() => {
-    GetCouncils(); // Call the function
-    fetchUserData();
-  }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      GetCouncils();
+    }, []) 
+  );
 
-  const handlePress = async () => {
-    try {
-      await AsyncStorage.removeItem('userToken');
-      console.log('Token removed successfully');
-      navigation.replace('Login');
-    } catch (error) {
-      console.error('Error removing token:', error);
-      Alert.alert('Error', 'Failed to log out. Please try again.');
-    }
+  const handlePress = () => {
+    Alert.alert(
+      'Do you want to log out?',
+      'Are you sure?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Ok',
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem('userToken');
+              navigation.replace('Login');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to log out.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const renderCouncilCard = ({ item }) => (
     <View style={styles.cardContainer}>
-      <CouncilCard council={item} navigation={navigation} member={memberId}/>
+      <CouncilCard council={item} navigation={navigation} member={memberId} />
     </View>
   );
- 
 
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const userData = await AsyncStorage.getItem('userData');
-      if (userData && userData.memberId) {
-        setMemberId(userData.memberId);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-  
-  
   return (
     <SafeAreaView style={styles.container}>
       <WavyBackground />
-      <Text style={styles.text}>Neighborhood</Text>
-      <Text style={styles.text}>Council</Text>
-      <Text style={styles.text}>Id : {memberId} </Text>
+
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>Neighborhood</Text>
+        <Text style={styles.headerText}>Council</Text>
+      </View>
+
       <View style={styles.contentContainer}>
         <FlatList
           data={councilData}
@@ -238,20 +239,31 @@ export default function HomeScreen({ route, navigation }) {
           contentContainerStyle={styles.listContent}
         />
       </View>
-      <Button title='Logout' onPress={handlePress}></Button>
+
       <FAB
         icon="plus"
         style={styles.fab}
-        color="#fff"
-        onPress={()=>(navigation.navigate('JoinCouncil', {memberID : memberId}))}
+        color="#000"
+        onPress={() => navigation.navigate('JoinCouncil', { memberID: memberId })}
       />
-      <View style={styles.footerContainer}>
-        <Image
-          source={require('../assets/Footer.png')}
-          style={[styles.footer, { width: width }]}
-          resizeMode="contain"
-        />
-      </View>
+      <FAB
+        icon="logout-variant"
+        style={styles.fab1}
+        color="#000"
+        onPress={handlePress}
+      />
+      <FAB
+        icon="account"
+        style={styles.fab2}
+        color="#000"
+        onPress={() => navigation.navigate('ProfileScreen')}
+      />
+
+      <Image
+        source={require('../assets/Footer.png')}
+        style={[styles.footer, { width: width }]}
+        resizeMode="stretch"
+      />
     </SafeAreaView>
   );
 }
@@ -259,48 +271,53 @@ export default function HomeScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF', 
-    
+    backgroundColor: '#FFFFFF',
+  },
+  headerContainer: {
+    alignItems: 'center',
+    marginTop: 50,
+    marginBottom: 20,
+  },
+  headerText: {
+    fontFamily: 'KronaOne-Regular',
+    fontSize: 35,
+    color: '#000',
+    marginBottom: 5,
   },
   contentContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    bottom: 100,
-    top : 10,    
-    zIndex : -1
-  },
-  cardContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 8,
+    paddingHorizontal: 0,
+    paddingBottom: 150,
   },
   listContent: {
-    paddingBottom: 60, 
-    paddingTop: 160, 
+    paddingBottom: 20,
   },
-  text: {
-    fontFamily: 'KronaOne-Regular',
-    fontSize: 30,
-    textAlign: 'left',
-    left: 5,
-    top: 30,
-    color: 'black',
-  },
-  footerContainer: {
-    position: 'absolute',
-    bottom: 0,
-    alignItems: 'center',
-    zIndex: -1,
-  },
-  footer: {
-    height: 100,
-    zIndex: -1,
+  cardContainer: {
+    borderRadius: 20,
+    padding: 10,
+   
   },
   fab: {
     position: 'absolute',
     right: 20,
-    bottom: 100,
-    borderRadius: 50,
+    bottom: 90,
     backgroundColor: '#F0C38E',
+  },
+  fab1: {
+    position: 'absolute',
+    left: 20,
+    bottom: 90,
+    backgroundColor: '#F0C38E',
+  },
+  fab2: {
+    position: 'absolute',
+    left: 90,
+    bottom: 90,
+    backgroundColor: '#F0C38E',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    zIndex: -1,
   },
 });

@@ -61,7 +61,7 @@ export default function Login({}){
   // }
   // };
   const [isLoggedIn, setIsLoggedIn] = useState(null);
-
+  const { width } = useWindowDimensions();
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -137,6 +137,7 @@ export default function Login({}){
       <WavyBackground/>
       <View style={styles.logoContainer}>
           <View style={styles.logo}>
+            {/* Icon placeholder */}
             <Image source={require('../assets/UserProfile.png')} style={styles.image}></Image>
           </View>
         </View>
@@ -157,10 +158,11 @@ export default function Login({}){
             Don’t have an account? <Text style={styles.signUpLink} onPress={() => navigation.navigate('SignUp')}>Sign Up!</Text>
           </Text>
         </TouchableOpacity>
-        <View style={styles.footer}>
-      <Image source={require('../assets/Footer.png')}></Image>
-      {/* Footer content */}
-    </View>
+        <Image
+          source={require('../assets/Footer.png')}
+          style={[styles.footer, { width: width }]} // image width to screen width
+          resizeMode="stretch" // Maintain aspect ratio
+        />
     </View> 
   );
 }
@@ -235,7 +237,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    bottom: 2,
+    bottom: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: useWindowDimensions,

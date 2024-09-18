@@ -220,13 +220,11 @@ export default function SignUp () {
       <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.keyboardAvoidingView}>
-      <View style={styles.footerContainer}>
       <Image
           source={require('../assets/Footer.png')}
           style={[styles.footer, { width: width }]} // image width to screen width
-          resizeMode="contain" // Maintain aspect ratio
+          resizeMode="stretch" // Maintain aspect ratio
         />
-      </View>
   </KeyboardAvoidingView>
     </SafeAreaView>
   
@@ -264,15 +262,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF', // Set the background color to white
   },
-  footerContainer: {
+  footer: {
     position: 'absolute',
-    bottom: 0, 
-    width: '100%',
-    alignItems: 'center',
+    bottom: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: useWindowDimensions,
     zIndex: -1,
-  },
-  footer : { 
-   
   },
   signUpButton: {
     width: '80%',
