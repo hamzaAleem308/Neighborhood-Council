@@ -40,7 +40,7 @@ export default function CreateCouncil({ route, navigation }) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(post), // Stringify the object
+            body: JSON.stringify(post),
         });
 
         const json = await response.json();

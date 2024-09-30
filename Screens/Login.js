@@ -6,6 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingScreen from './LoadingScreen';
 import HomeScreen from './Home';
+import { IconButton } from 'react-native-paper';
+
 
 export default function Login({}){
   const [phoneNo, setPhoneNo] = useState('');
@@ -62,6 +64,8 @@ export default function Login({}){
   // };
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const { width } = useWindowDimensions();
+  const [showPassword, setShowPassword] = useState(false); 
+  
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -103,9 +107,16 @@ export default function Login({}){
 
         if (response.ok) {
           const userData = {
-            memberId: json.id, // Assuming `json` contains the `id`
-            fullName: json.Full_Name,
-            // Other user data
+              memberId: json.id,                // ID of the member
+              phoneNo: json.PhoneNo,            // Phone number of the member
+              fullName: json.Full_Name,         // Full name of the member
+              gender: json.Gender,              // Gender of the member
+              dateOfBirth: json.DoB,            // Date of birth of the member
+              province: json.Province,          // Province where the member resides
+              city: json.City,                  // City where the member resides
+              address: json.Address,            // Address of the member
+              password: json.Password,          // Password of the member
+              dateJoined: json.Date_joined      // Date when the member joined
           };
           await storeUserData(userData);
           console.log('Stored Id: ' + userData.memberId);
@@ -133,6 +144,7 @@ export default function Login({}){
     }
   };
   return (
+    
     <View style={styles.container}>
       <WavyBackground/>
       <View style={styles.logoContainer}>
@@ -142,11 +154,25 @@ export default function Login({}){
           </View>
         </View>
         <View>
-        <Text style={styles.title}>Sign In</Text>
+        <Text style={styles.title1}>Hello there!</Text>
+        <Text style={styles.title}>Sign In to Continue</Text>
         </View>
-        
+  
         <TextInput style={styles.input} placeholder="Phone No" keyboardType="phone-pad" onChangeText={setPhoneNo} placeholderTextColor="#000" />
-        <TextInput style={styles.input} placeholder="Password" secureTextEntry onChangeText={setPassword} placeholderTextColor="#000"/>
+        <View style={styles.container2}>
+        <TextInput style={styles.inputPassword} placeholder="Password" secureTextEntry={!showPassword} onChangeText={setPassword} placeholderTextColor="#000"/>
+      
+        <TouchableOpacity
+        onPress={() => setShowPassword(!showPassword)} 
+        style={styles.icon}
+      >
+        <IconButton
+          icon={showPassword ? 'eye-off' : 'eye'} 
+          color="black"
+          onPress={() => setShowPassword(!showPassword)} 
+        />
+      </TouchableOpacity>
+      </View>
         {/* <TouchableOpacity>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity> */}
@@ -187,7 +213,6 @@ const styles = StyleSheet.create({
     height : 150,
     width : 150
   },
-
   logo: {
     width: 150,
     height: 150,
@@ -201,6 +226,22 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    textAlign: 'center'
+  },
+  title1: {
+    color : 'black',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+    fontFamily: 'KronaOne-Regular',
+    color: '#000',
+    marginBottom: 5,
+  },
+  container2: {
+    width: '100%',
+    alignItems: 'center',
+    position: 'relative', 
   },
   input: {
     width: '80%',
@@ -209,6 +250,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
     marginBottom: 10,
     color : 'black',
+  },
+  inputPassword: {
+    width: '80%',
+    padding: 15,
+    borderRadius: 25,
+    backgroundColor: '#F8F9FA',
+    marginBottom: 10,
+    color: 'black',
+    paddingRight: 50, // Add right padding for the icon space
+  },
+  icon: {
+    position: 'absolute',
+    right: '12%', // Position the icon to the right inside the input
+    justifyContent: 'center',
+    height: '90%',
   },
   forgotPassword: {
     alignSelf: 'flex-end',
@@ -225,7 +281,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   signInButtonText: {
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
   },
   signUpText: {

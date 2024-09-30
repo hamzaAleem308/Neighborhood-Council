@@ -3,17 +3,17 @@ import { Text, Image, SafeAreaView, StyleSheet, TouchableOpacity, useWindowDimen
 import WavyBackground from '../Background/WavyBackground';
 import DividerLine from '../Background/LineDivider';
 
-export default function AdministrateElection ({ navigation }) {
+export default function AdministrateElection ({ navigation, route }) {
   const { width } = useWindowDimensions(); // screen width
-  
+  const { councilId } = route.params;
   return (
     <SafeAreaView style={styles.container}>
       <WavyBackground />
-      <Text style={styles.titleText}>Panel Elecion</Text>
-     <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('CreateElection')}}>
+      <Text style={styles.titleText}>Setup the Panel Election</Text>
+     <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Create Election', {councilID: councilId})}}>
           <Text style={styles.signInButtonText}>Create New Election</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('NominateCandidate')}}>
+        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('NominateCandidate' , {councilID: councilId})}}>
             <Text style={styles.signInButtonText}>Nominate Candidates</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('ViewElection')}}>
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   titleText: {
-    bottom : 70,
+    bottom : 100,
     color: 'black',
     margin: 10,
     fontSize: 30,
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    bottom: 2,
+    bottom: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: useWindowDimensions,
@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     alignItems : 'center'
   },
   signInButton: {
+    top: 20,
     width: '90%',
     padding: 15,
     borderRadius: 25,

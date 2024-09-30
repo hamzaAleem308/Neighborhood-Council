@@ -307,7 +307,7 @@ dropDown :{
   fontSize: 5
 },
 dobButton : {    
-  width: '80%',
+  width: '60%',
   padding: 15,
   borderRadius: 25,
   backgroundColor: '#F8F9FA',

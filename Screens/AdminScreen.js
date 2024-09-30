@@ -8,66 +8,114 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function AdminScreen ({ route }) {
   const { width } = useWindowDimensions(); // screen width
   const navigation = useNavigation();
-  const [councilData , setCouncilData] = useState([]);
+  const [councilData , setCouncilData] = useState({});
+  const [membersCount, setMembersCount] = useState(0);
 
   const { Council } = route.params;
+  const getCouncilData = async () => {
+    try {
+      const response = await fetch(`${baseURL}Council/GetCouncil?councilId=${Council}`);
+      if (response.ok) {
+        const json = await response.json();
+        console.log(json)
+        setCouncilData(json);
+      } else {
+        Alert.alert('Error', 'Failed to load data');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred while loading data');
+    }
+  };
+
+
+  const [memberId, setMemberId] = useState(null);
+  const [phoneNo, setPhoneNo] = useState(null);
+  const [fullName, setFullName] = useState(null);
+  const [gender, setGender] = useState(null);
+  const [dateOfBirth, setDateOfBirth] = useState(null);
+  const [province, setProvince] = useState(null);
+  const [city, setCity] = useState(null);
+  const [address, setAddress] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [dateJoined, setDateJoined] = useState(null);
 
   useEffect(() => {
-    // You can use councilId, councilName, and councilDescription here
-    console.log('Council ID:', {Council}); 
+    const fetchUserData = async () => {
+      const userData = await getUserData();
+      if (userData) {
+        setMemberId(userData.memberId);
+        setPhoneNo(userData.phoneNo);
+        setFullName(userData.fullName);
+        setGender(userData.gender);
+        setDateOfBirth(userData.dateOfBirth);
+        setProvince(userData.province);
+        setCity(userData.city);
+        setAddress(userData.address);
+        setPassword(userData.password);
+        setDateJoined(userData.dateJoined);
+      }
+    };
+
+    fetchUserData();
   }, []);
 
+  const getUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('userData');
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  };
 
-  useEffect(() => {
-    const getCouncilData = async () => {
-      try {
-        const response = await fetch(`${baseURL}Council/GetCouncil?councilId=${Council}`);
-        if (response.ok) {
-          const json = await response.json();
-          // Save data in AsyncStorage
-          await AsyncStorage.setItem('councilData', JSON.stringify(json));
-          setCouncilData(json);
-        } else {
-          Alert.alert('Error', 'Failed to load data');
-        }
-      } catch (error) {
-        Alert.alert('Error', 'An error occurred while loading data');
+  const getCouncilMemberCount = async () => {
+    try {
+      const response = await fetch(`${baseURL}Council/CountCouncilMembers?councilId=${Council}`);
+      if (response.ok) {
+        const json = await response.json();
+        console.log(json);
+        setMembersCount(json.MemberCount);  // Extract MemberCount from the response
+      } else {
+        Alert.alert('Error', 'Failed to load data');
       }
-    };
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred while loading data');
+    }
+  };
+
+  
+  useEffect(() => {
     getCouncilData();
-  }, [Council]);
-
-
-  useEffect(() => {
-    const fetchCouncilDataFromStorage = async () => {
-      try {
-        const storedData = await AsyncStorage.getItem('councilData');
-        if (storedData) {
-          setCouncilData(JSON.parse(storedData));
-        }
-      } catch (error) {
-        Alert.alert('Error', 'Failed to fetch data from storage');
-      }
-    };
-
-    fetchCouncilDataFromStorage();
-  }, [])
+    getCouncilMemberCount();
+  }, []);
 
   useEffect(() => {
-    console.log('Updated Council Data:', councilData);
+    if (councilData) {
+      console.log('Council Data updated:', councilData);
+      console.log('Council Members:', membersCount);
+    }
   }, [councilData]);
+ 
+
+  // useEffect(() => {
+  //   console.log('Updated Council Data:', councilData);
+  // }, [councilData]);
 
   return (
     <SafeAreaView style={styles.container}>
       <WavyBackground />
-      <Text style={{color: 'black', }}>{councilData.Name}</Text>
-      <Text style={{color : 'black', fontSize: 20, marginBottom : 50}}>Members: {councilData.id}</Text>
+      {/* <Text style={styles.welcomeText}>Welcome {fullName}</Text>
+      <Text style={styles.nameText}>{fullName}</Text> */}
+      <Text style={styles.name}>{councilData?.Name || 'Loading...'}</Text>
+      
+      <Text style={styles.memberCount}>Members: {membersCount}</Text>
       <View style={{flexDirection : 'row'}}>
       <TouchableOpacity onPress={()=>{navigation.navigate('InviteResident', {councilId : Council})}}>
       <View style={styles.logoContainer}>
           <View style={styles.logo}>
             {/* Icon placeholder */}
             <Image source={require('../assets/JoinLink.png')} style={styles.image} ></Image>
+            <Text style={styles.logoText}>Link</Text>
           </View>
         </View> 
         </TouchableOpacity>
@@ -76,22 +124,23 @@ export default function AdminScreen ({ route }) {
           <View style={styles.logo}>
             {/* Icon placeholder */}
             <Image source={require('../assets/announcement.png')} style={styles.image}></Image>
+            <Text style={styles.logoText}>Announcement</Text>
           </View>
         </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=>{console.log('pressed')}}>
+        <TouchableOpacity onPress={()=>{navigation.navigate('AdministrateElection', {councilId : Council})}}>
         <View style={styles.logoContainer}>
           <View style={styles.logo}>
             {/* Icon placeholder */}
             <Image source={require('../assets/election.png')} style={styles.image}></Image>
+            <Text style={styles.logoText}>Election</Text>
           </View>
         </View>
         </TouchableOpacity>
         </View>
       <DividerLine/>
-      <Text style={styles.desc}> {councilData.Desciption}</Text>
+      <Text style={styles.desc}>Description: {councilData?.Description || 'Loading...'}</Text>
       <DividerLine/>
-      {/* <Text style={{width: useWindowDimensions, color:'black',fontSize: 50 , resizeMode:'contained'}}>-</Text> */}
       <TouchableOpacity style={styles.signInButton} onPress={{}}>
           <Text style={styles.signInButtonText}>Edit Community Info</Text>
         </TouchableOpacity>
@@ -123,12 +172,35 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     marginBottom: 40,
-  justifyContent : 'space-between',
+    justifyContent: 'center',  
+    alignItems: 'center', 
   marginHorizontal : 35
   },
   image : {
     height : 60,
     width : 60
+  },
+  memberCount:{
+    color : 'black', 
+    fontSize: 17, 
+    marginBottom : 50,
+     },
+  name:{
+    color: 'black',
+    fontSize: 25,
+    fontWeight :'700',
+  },
+  welcomeText: {
+    fontFamily: 'KronaOne-Regular',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  nameText: {
+    fontSize: 20,
+    top : 5,
+    fontWeight: '600',
+    color: 'black',
   },
   logo: {
     width: 60,
@@ -138,16 +210,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  logoText: {
+    marginTop: 8, 
+    fontSize: 14, 
+    color: 'black', 
+  },
   footer: {
     position: 'absolute',
-    bottom: 2,
+    bottom: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: useWindowDimensions,
     zIndex: -1,
   },
   desc:{
-    fontSize: 20,
+    fontSize: 17,
+    color: 'black',
+    marginLeft: 10,
+    right: 5,
     textAlign: 'center',
     alignItems : 'center'
   },
@@ -157,7 +237,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: '#F0C38E',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   signInButtonText: {
     color: '#000',

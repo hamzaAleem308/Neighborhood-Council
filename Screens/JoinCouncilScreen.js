@@ -9,6 +9,10 @@ export default function JoinCouncil ({route, navigation}) {
  
 
   const JoinCouncilUsingJoinCode = async () => {
+    if(!councilLink){
+      Alert.alert('Please Enter Code to Join Council.')
+      return;
+    }
     try {
       const response = await fetch(`${baseURL}Council/JoinCouncilUsingCode?memberId=${memberID}&joinCode=${councilLink}`, {
         method: 'Post',
@@ -21,17 +25,18 @@ export default function JoinCouncil ({route, navigation}) {
         console.log(JSON.stringify(json));
         Alert.alert('Council added successfully!', 'Now you will be redirected to Home.', 
           [{ text: 'OK', onPress: () => navigation.navigate('HomeScreen', { member: memberID })}]);
-      } else if( response.status == 204) {
+      } 
+      else if( response.status == 204) {
         Alert.alert('No Council Found with this Join Code')
       } 
       else if( response.status == 409) {
-        Alert.alert('You are already a part of this council')
+        Alert.alert('You are already a part of this council!')
       }
       else{
         Alert.alert('Error', 'Failed to load Data');
       }
     } catch (error) {
-      Alert.alert('Error', 'No Co');
+      Alert.alert('Error', 'No Councils Associated with this Code');
     }
   };
 
@@ -42,12 +47,12 @@ export default function JoinCouncil ({route, navigation}) {
     <SafeAreaView style={styles.container}>
       <WavyBackground />
       
-      <Text style={{color: 'black', margin: 30, fontSize: 30, textAlign:'center', }}>Let's Get Started by Creating or Joining a Council.</Text>
+      <Text style={styles.header}>Let's Get Started by Creating or Joining a Council.</Text>
       <TouchableOpacity style={styles.button} onPress={handlePress}>
           <Text style={styles.buttonText}>Create Council</Text>
         </TouchableOpacity>
         <Text style={{color: 'black', textAlign : 'center', fontSize: 20 , margin:8}}>OR  </Text>
-      <TextInput style={styles.input} placeholder="Paste Link Here" onChangeText={setCouncilLink} placeholderTextColor="#0007" />
+      <TextInput style={styles.input} placeholder="Enter Code Here!" onChangeText={setCouncilLink} placeholderTextColor="#0007" />
       <TouchableOpacity style={styles.button} onPress={JoinCouncilUsingJoinCode}>
           <Text style={styles.buttonText}>Join Council</Text>
         </TouchableOpacity>
@@ -71,6 +76,15 @@ const styles = StyleSheet.create({
     alignItems : 'center',
     
   },
+  header:{
+    color: 'black', 
+    margin: 30, 
+    fontSize: 30, 
+    textAlign:'center', 
+    bottom : 40,
+    textTransform : 'capitalize'
+  }
+  ,
   footerContainer: {
     position: 'absolute',
     bottom: 0, 

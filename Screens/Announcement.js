@@ -98,7 +98,6 @@ const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 20,
     padding: 10,
-   
   },
   fab: {
     position: 'absolute',

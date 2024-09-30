@@ -6,17 +6,13 @@ import baseURL  from './Api';
 
 export default function InviteMember ( {route} ) {
   const { width } = useWindowDimensions(); // screen width
-  const[link, setLink] = useState('');
+  const[link, setLink] = useState({});
   const {councilId} = route.params
-  // const handlePress =() =>{
-  //   Clipboard.setString(link);
-  //   Alert.alert('Copied to Clipboard!', 'Link has been copied to clipboard.');
-  // }
-  
+
   useEffect(() => {
     const getJoinCode = async () => {
       try {
-        const response = await fetch(`${baseURL}Council/GetCouncilJoinCode?councilId=${councilId}`);
+        const response = await fetch(`${baseURL}Council/GetCouncil?councilId=${councilId}`);
         if (response.ok) {
           const json = await response.json();
           console.log('Join Code:', json);
@@ -34,13 +30,15 @@ export default function InviteMember ( {route} ) {
 
   const handlePress = () => {
     if (link) {
+      const joinCodeMessage = `Join *${link.Name}* using this code within the Neighborhood Council App under Join Council\n\n${link.JoinCode}`;
       Share.share({
-        message: `Join my council using this code: ${link}`,
+        message: joinCodeMessage,
       }).catch((error) => console.log('Error sharing the link', error));
     } else {
       Alert.alert('Error', 'No join code available to share');
     }
   };
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -48,7 +46,7 @@ export default function InviteMember ( {route} ) {
       <Text style={styles.titleText}>Invite Residents</Text>
       <Text style={styles.header}>Add Residents by Inviting them Through this link </Text>
     <View style={styles.signInButton1}> 
-        <Text style={styles.signInButtonText1}>{link}</Text>
+        <Text style={styles.signInButtonText1}>{link.JoinCode}</Text>
       </View>
         <TouchableOpacity style={styles.signInButton} onPress={handlePress}>
             <Text style={styles.signInButtonText}>Share Join Code!</Text>

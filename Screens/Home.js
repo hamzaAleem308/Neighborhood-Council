@@ -194,8 +194,8 @@ export default function HomeScreen({ route, navigation }) {
 
   const handlePress = () => {
     Alert.alert(
-      'Do you want to log out?',
       'Are you sure?',
+      'Do you want to log out?',
       [
         {
           text: 'Cancel',
@@ -295,7 +295,6 @@ const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 20,
     padding: 10,
-   
   },
   fab: {
     position: 'absolute',
