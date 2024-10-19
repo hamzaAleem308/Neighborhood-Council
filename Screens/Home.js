@@ -132,12 +132,14 @@ import { FAB } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CouncilCard from '../Cards/CouncilCard';
 import { useFocusEffect } from '@react-navigation/native';
+import WavyBackground2 from '../Background/WavyBackground2';
 
 export default function HomeScreen({ route, navigation }) {
   const { width } = useWindowDimensions();
   const [councilData, setCouncilData] = useState([]);
   const { memberID } = route.params;
   const [memberId, setMemberId] = useState(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -160,7 +162,6 @@ export default function HomeScreen({ route, navigation }) {
   };
 
   // useEffect(() => {
-   
   //   GetCouncils();
   // }, []);
 
@@ -182,7 +183,8 @@ export default function HomeScreen({ route, navigation }) {
         Alert.alert('Error', 'Failed to load Data');
       }
     } catch (error) {
-      Alert.alert('Error', 'An error occurred while loading Data');
+      console.error('An error occurred while loading Data')
+      //Alert.alert('Error', '');
     }
   };
 
@@ -224,7 +226,7 @@ export default function HomeScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <WavyBackground />
+      <WavyBackground2 />
 
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Neighborhood</Text>
@@ -236,9 +238,26 @@ export default function HomeScreen({ route, navigation }) {
           data={councilData}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderCouncilCard}
+          ListEmptyComponent={
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={{ textAlign: 'center', color: 'black', fontSize: 20 }}>
+                No Councils Added, try joining them with the plus icon
+              </Text>
+            </View>
+          }
           contentContainerStyle={styles.listContent}
         />
       </View>
+      {/* <FAB.Group
+            open={open}
+            style={styles.fab}
+            icon={open ? 'close' : 'plus'} // Switch between plus and close icon
+            actions={[
+              {
+                icon: 'Pencil',
+                label: 'Create Council!',
+                onPress: () => navigation.navigate('JoinCouncil', { memberID: memberId }),
+              },]}/> */}
 
       <FAB
         icon="plus"
@@ -280,7 +299,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontFamily: 'KronaOne-Regular',
-    fontSize: 35,
+    fontSize: 30,
     color: '#000',
     marginBottom: 5,
   },
@@ -290,6 +309,7 @@ const styles = StyleSheet.create({
     paddingBottom: 150,
   },
   listContent: {
+    marginTop: 50,
     paddingBottom: 20,
   },
   cardContainer: {

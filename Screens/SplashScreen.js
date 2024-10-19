@@ -15,7 +15,7 @@ const shareJoinCode = (code) => {
   return (
     <SafeAreaView style={styles.container}>
       <WavyBackground />
-      {/* <View style = {styles.textContainer} >
+       <View style = {styles.textContainer} >
       <Text style={styles.header}>
          Neighborhood
         </Text>
@@ -25,8 +25,8 @@ const shareJoinCode = (code) => {
         <Text  style={styles.tagline}>
          Join Hands, Solve Together, Thrive as One Community.
         </Text>
-        </View> */}
-      <Button onPress={shareJoinCode} title='Press Me'></Button>
+        </View> 
+      {/* <Button onPress={shareJoinCode} title='Press Me'></Button> */}
 
       <View style={styles.footerContainer}>
         <Image

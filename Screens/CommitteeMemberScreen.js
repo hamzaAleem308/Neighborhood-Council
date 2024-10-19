@@ -25,7 +25,4 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
-  footer: {
-    height: 100,
-  },
 });

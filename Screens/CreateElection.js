@@ -231,7 +231,7 @@ export default function CreateElection({ navigation, route }) {
 
       if (response.ok) {
         Alert.alert('Success!', 'Election Added Successfully, Now select Candidates for Election!', 
-            [{ text: 'OK', onPress: () => navigation.navigate('NominateCandidate', {councilID: councilID})}]);
+            [{ text: 'OK', onPress: () => navigation.navigate('Nominate Candidate', {councilID: councilID})}]);
         console.log('Election Added Successfully');
       } else {
         Alert.alert('Error', 'Failed to create election');
@@ -249,7 +249,12 @@ export default function CreateElection({ navigation, route }) {
       Alert.alert('Please Enter the Name of the Election!');
       return;
     }
-   
+    
+    if(!sd || !ed){
+      Alert.alert('Please select Election Dates!')
+      return;
+    }
+
     if (sd < currentDate) {
     Alert.alert('Invalid Start Date', 'The start date cannot be in the past.');
     return;
@@ -279,7 +284,6 @@ export default function CreateElection({ navigation, route }) {
     <SafeAreaView style={styles.container}>
       <WavyBackground />
       <ScrollView>
-      
         <View style={styles.textContainer}>
           <Text style={styles.header}>Form Committee By Starting an Election</Text>
           <TextInput
@@ -326,9 +330,7 @@ export default function CreateElection({ navigation, route }) {
             <Text style={styles.signUpButtonText}>Create Election</Text>
           </TouchableOpacity>
         </View>
-
       </ScrollView>
-
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
@@ -348,7 +350,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-
   },
   input: {
     width: '80%',
@@ -367,6 +368,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: 100,
     marginVertical: 20,
+    textAlign: 'center'
   },
   container: {
     flex: 1,

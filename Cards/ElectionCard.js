@@ -2,34 +2,64 @@ import React, { useEffect, useState } from 'react';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import { StyleSheet, Dimensions, Alert, View } from 'react-native';
 
-export default function ElectionCard({  election, navigation }) {
+export default function ElectionCard({ council, election, navigation }) {
+  //const [ council ] = route.params;
 
   return (
-    <Card style={styles.card} onPress={{}}>
+    <Card style={styles.card} onPress={() =>navigation.navigate('CreateNominees', {electionName: election.Name, electionId: election.id, councilId: council })}>
       <Card.Content>
-        <Title style={{ color : 'black', fontWeight : '700'}}>{election.Name}</Title>
-        <Paragraph style={{ color : 'black'}}>Status: {election.status}</Paragraph>
-        <Paragraph style={{ color : 'black' , fontWeight : '500' }}>Start Date</Paragraph>
-        <Paragraph style={{ color : 'black'}}>{election.StartDate}</Paragraph>
-        <View style={{marginTop: 0}}>
-        <Paragraph style={{ color : 'black' , fontWeight : '500'}}>End Date</Paragraph>
-        <Paragraph style={{ color : 'black'}}>{election.EndDate}</Paragraph>
-        <Paragraph style={{ color : 'black', textAlign: 'center', top : 5}}>Click to manage Election!</Paragraph>
+        <Title style={styles.title}>{election.Name}</Title>
+        <Paragraph style={styles.text}>Status: {election.status}</Paragraph>
+        <Paragraph style={styles.subtitle}>Start Date</Paragraph>
+        <Paragraph style={styles.text}>{election.StartDate}</Paragraph>
+        <View style={styles.view}>
+          <Paragraph style={styles.subtitle}>End Date</Paragraph>
+          <Paragraph style={styles.text}>{election.EndDate}</Paragraph>
+          <Paragraph style={styles.manageText}>Click to manage Election!</Paragraph>
         </View>
       </Card.Content>
     </Card>
   );
 }
-
-//onPress={() => navigation.navigate('Table', { council: council.id })}
-
-const styles = StyleSheet.create({
-  card: {
-    flex: 1,
-    marginRight: 2,
-    height: '80%',
-    borderRadius : 35,
-    width: Dimensions.get('window').width - 25, 
-    backgroundColor : '#eab676'
-  },
-});
+  
+  
+  //onPress={() => navigation.navigate('Table', { council: council.id })}
+  
+  const styles = StyleSheet.create({
+    card: {
+      flex: 1,
+      marginRight: 2,
+      height: '80%',
+      borderRadius : 35,
+      width: Dimensions.get('window').width - 25, 
+      backgroundColor : '#f5d8a0'
+    },
+    // card: {
+    //   margin: 10,
+    //   padding: 10,
+    //   backgroundColor: 'white',
+    //   borderRadius: 8,
+    //   elevation: 3,
+    // },
+    title: {
+      color: 'black',
+      fontWeight: '700',
+    },
+    text: {
+      color: 'black',
+    },
+    subtitle: {
+      color: 'black',
+      fontWeight: '500',
+    },
+    view: {
+      marginTop: 0,
+    },
+    manageText: {
+      color: 'black',
+      textAlign: 'center',
+      marginTop: 7,
+      fontWeight: '700',
+      fontSize: 17,
+    }
+  });

@@ -15,7 +15,7 @@ export default function InviteMember ( {route} ) {
         const response = await fetch(`${baseURL}Council/GetCouncil?councilId=${councilId}`);
         if (response.ok) {
           const json = await response.json();
-          console.log('Join Code:', json);
+          console.log('Council Data:', json);
           setLink(json);
         } else {
           Alert.alert('Failed to fetch Join Code');
@@ -46,7 +46,7 @@ export default function InviteMember ( {route} ) {
       <Text style={styles.titleText}>Invite Residents</Text>
       <Text style={styles.header}>Add Residents by Inviting them Through this link </Text>
     <View style={styles.signInButton1}> 
-        <Text style={styles.signInButtonText1}>{link.JoinCode}</Text>
+        <Text style={styles.signInButtonText1}>{link?.JoinCode || 'Loading...'}</Text>
       </View>
         <TouchableOpacity style={styles.signInButton} onPress={handlePress}>
             <Text style={styles.signInButtonText}>Share Join Code!</Text>

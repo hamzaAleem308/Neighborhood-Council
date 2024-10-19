@@ -4,6 +4,7 @@ import WavyBackground from '../Background/WavyBackground';
 import DividerLine from '../Background/LineDivider';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import WavyBackground2 from '../Background/WavyBackground2';
 
 export default function AdminScreen ({ route }) {
   const { width } = useWindowDimensions(); // screen width
@@ -95,153 +96,132 @@ export default function AdminScreen ({ route }) {
       console.log('Council Members:', membersCount);
     }
   }, [councilData]);
- 
 
-  // useEffect(() => {
-  //   console.log('Updated Council Data:', councilData);
-  // }, [councilData]);
+return (
+  <SafeAreaView style={styles.container}>
+  
+    <WavyBackground2/>
+    <Text style={styles.name}>{councilData?.Name || 'Loading...'}</Text>
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <WavyBackground />
-      {/* <Text style={styles.welcomeText}>Welcome {fullName}</Text>
-      <Text style={styles.nameText}>{fullName}</Text> */}
-      <Text style={styles.name}>{councilData?.Name || 'Loading...'}</Text>
-      
-      <Text style={styles.memberCount}>Members: {membersCount}</Text>
-      <View style={{flexDirection : 'row'}}>
-      <TouchableOpacity onPress={()=>{navigation.navigate('InviteResident', {councilId : Council})}}>
-      <View style={styles.logoContainer}>
-          <View style={styles.logo}>
-            {/* Icon placeholder */}
-            <Image source={require('../assets/JoinLink.png')} style={styles.image} ></Image>
-            <Text style={styles.logoText}>Link</Text>
-          </View>
-        </View> 
-        </TouchableOpacity>
-        <TouchableOpacity onPress={()=>{console.log('pressed')}}>
-      <View style={styles.logoContainer}>
-          <View style={styles.logo}>
-            {/* Icon placeholder */}
-            <Image source={require('../assets/announcement.png')} style={styles.image}></Image>
-            <Text style={styles.logoText}>Announcement</Text>
-          </View>
+    <Text style={styles.memberCount}>Members: {membersCount}</Text>
+    {/* Invite Resident */}
+    <View style={styles.iconRow}>
+      <TouchableOpacity onPress={() => navigation.navigate('Invite Resident', { councilId: Council })}>
+        <View style={styles.iconContainer}>
+          <Image source={require('../assets/JoinLink.png')} style={styles.icon} />
+        <Text style={styles.iconLabel}>Invite</Text>
+      </View>
+      </TouchableOpacity>
+      {/* Announcement Icon */}
+      <TouchableOpacity onPress={() => navigation.navigate('Announcement', {})}>
+        <View style={styles.iconContainer}>
+          <Image source={require('../assets/announcement.png')} style={styles.icon} />
+          <Text style={styles.iconLabel}>Announce</Text>
         </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={()=>{navigation.navigate('AdministrateElection', {councilId : Council})}}>
-        <View style={styles.logoContainer}>
-          <View style={styles.logo}>
-            {/* Icon placeholder */}
-            <Image source={require('../assets/election.png')} style={styles.image}></Image>
-            <Text style={styles.logoText}>Election</Text>
-          </View>
-        </View>
-        </TouchableOpacity>
-        </View>
-      <DividerLine/>
-      <Text style={styles.desc}>Description: {councilData?.Description || 'Loading...'}</Text>
-      <DividerLine/>
-      <TouchableOpacity style={styles.signInButton} onPress={{}}>
-          <Text style={styles.signInButtonText}>Edit Community Info</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton}>
-            <Text style={styles.signInButtonText}>Manage Members</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton}>
-            <Text style={styles.signInButtonText}>Meetings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton}>
-            <Text style={styles.signInButtonText}>Complaints</Text>
-        </TouchableOpacity>
-        <Image
+      </TouchableOpacity>
+      {/* Election Icon */}
+    <TouchableOpacity onPress={() => navigation.navigate('Administrate Election', { councilId: Council })}>
+      <View style={styles.iconContainer}>
+        <Image source={require('../assets/election.png')} style={styles.icon} />
+        <Text style={styles.iconLabel}>Election</Text>
+      </View>
+    </TouchableOpacity>
+  </View>
+
+  <DividerLine />
+
+  <Text style={styles.desc}>Description: {councilData?.Description || 'Loading...'}</Text>
+
+  <DividerLine />
+
+  <TouchableOpacity style={styles.signInButton} onPress={{}}>
+    <Text style={styles.signInButtonText}>Edit Community Info</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.signInButton}>
+    <Text style={styles.signInButtonText}>Manage Members</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.signInButton}>
+    <Text style={styles.signInButtonText}>Meetings</Text>
+  </TouchableOpacity>
+  <TouchableOpacity style={styles.signInButton}>
+    <Text style={styles.signInButtonText}>Complaints</Text>
+  </TouchableOpacity>
+
+  <Image
           source={require('../assets/Footer.png')}
-          style={[styles.footer, { width: width }]}
-          resizeMode="stretch" 
+          style={[styles.footer, { width: width }]} // image width to screen width
+          resizeMode="stretch" // Maintain aspect ratio
         />
-    </SafeAreaView>
-  );
-};
+</SafeAreaView>
 
+);
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF', 
-    alignItems:'center',
-    justifyContent:'center'
+    backgroundColor: '#FFFFFF',
+    padding: 20, 
+    alignItems: 'center',
   },
-  logoContainer: {
-    marginBottom: 40,
-    justifyContent: 'center',  
-    alignItems: 'center', 
-  marginHorizontal : 35
-  },
-  image : {
-    height : 60,
-    width : 60
-  },
-  memberCount:{
-    color : 'black', 
-    fontSize: 17, 
-    marginBottom : 50,
-     },
-  name:{
+  name: {
     color: 'black',
-    fontSize: 25,
-    fontWeight :'700',
-  },
-  welcomeText: {
-    fontFamily: 'KronaOne-Regular',
     fontSize: 24,
-    fontWeight: 'bold',
-    color: 'black',
+    fontWeight: '700',
+    marginVertical: 20,
   },
-  nameText: {
-    fontSize: 20,
-    top : 5,
-    fontWeight: '600',
-    color: 'black',
+  memberCount: {
+    color: 'gray',
+    fontSize: 16,
+    marginBottom: 30, 
   },
-  logo: {
-    width: 60,
-    height: 60,
-    borderRadius: 75,
-    backgroundColor: '#fff',
+  iconRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginBottom: 30,
+  },
+  iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoText: {
-    marginTop: 8, 
-    fontSize: 14, 
-    color: 'black', 
+  icon: {
+    height: 50,
+    width: 50,
+    marginBottom: 5, 
+    backgroundColor: '#fff',
+    borderRadius: 10,
   },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: useWindowDimensions,
-    zIndex: -1,
-  },
-  desc:{
-    fontSize: 17,
+  iconLabel: {
+    fontSize: 14,
     color: 'black',
-    marginLeft: 10,
-    right: 5,
+    fontWeight: '500',
     textAlign: 'center',
-    alignItems : 'center'
+    width: 80, 
+  },
+  desc: {
+    fontSize: 16,
+    color: 'black',
+    textAlign: 'center',
+    marginVertical: 20,
   },
   signInButton: {
-    width: '90%',
+    width: '100%',
     padding: 15,
     borderRadius: 25,
-    backgroundColor: '#F0C38E',
+    backgroundColor: '#f5d8a0',
     alignItems: 'center',
-    marginBottom: 15,
+    marginVertical: 10,
   },
   signInButtonText: {
     color: '#000',
     fontWeight: 'bold',
+  },
+  footer: {
+    width: '100%',
+    position: 'absolute',
+    bottom: 0,
+    zIndex: -1,
   },
 
 });

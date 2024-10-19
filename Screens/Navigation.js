@@ -91,6 +91,8 @@ import ProfileScreen from './ProfileScreen';
 import CreateElection from './CreateElection';
 import NominateCandidate from './NominateCandidate';
 import ElectionHistory from './ElectionHistory';
+import CreateNominees from './CreateNominees';
+import ReportProblem from './ReportProblem';
 
 
 
@@ -110,18 +112,20 @@ export default function App() {
       <Stack.Screen name="Login" component={Login} options={{headerShown : false}}/>
       <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="JoinCouncil" component={JoinCouncil} options={{headerTransparent: true, headerTitleAlign: 'center',}}/>
-      <Stack.Screen name="CreateCouncil" component={CreateCouncil} options={{headerTransparent: true, headerTitleAlign: 'center',}}/>
+      <Stack.Screen name="CreateCouncil" component={CreateCouncil} options={{headerTransparent: true, headerTitleAlign: 'center', headerTitle: ''}}/>
       <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }}/>
       <Stack.Screen name="AdminScreen" component={AdminScreen} options={{ headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''}}/>
       <Stack.Screen name="ResidentScreen" component={ResidentScreen} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''}}/>
       <Stack.Screen name="CommitteeMemberScreen" component={CommitteeMemberScreen} options={{ headerTransparent: true, headerTitleAlign: 'center',  headerTitle: '' }}/>
-      <Stack.Screen name="InviteResident" component={InviteMember} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: '' }}/>
+      <Stack.Screen name="Invite Resident" component={InviteMember} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: '' }}/>
       <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: '' }}/>
       <Stack.Screen name="Create Election" component={CreateElection} options={{headerTransparent: true, headerTitleAlign: 'center',   }}/>
-      <Stack.Screen name="AdministrateElection" component={AdministrateElection} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: '' }}/>
-      <Stack.Screen name="NominateCandidate" component={NominateCandidate} options={{headerTransparent: true, headerTitleAlign: 'center',  }}/>
-      <Stack.Screen name="ElectionHistory" component={ElectionHistory} options={{headerTransparent: true, headerTitleAlign: 'center',  }}/>
-    
+      <Stack.Screen name="Administrate Election" component={AdministrateElection} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: '' }}/>
+      <Stack.Screen name="Nominate Candidate" component={NominateCandidate} options={{headerTransparent: true, headerTitleAlign: 'center',  }}/>
+      <Stack.Screen name="Election History" component={ElectionHistory} options={{headerTransparent: true, headerTitleAlign: 'center',  }}/>
+      <Stack.Screen name="CreateNominees" component={CreateNominees} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
+      <Stack.Screen name="ReportProblem" component={ReportProblem} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
+      
       </Stack.Navigator>
       {/* <Stack.Navigator>
       <Stack.Screen name="InviteResident" component={InviteMember} options={{headerTransparent: true, headerTitleAlign: 'center', }}/>

@@ -39,7 +39,7 @@ export default function CouncilCard({ route, council, navigation }) {
             navigation.replace('AdminScreen', {Council : council.id});
             break;
           case 'Member':
-            navigation.replace('ResidentScreen');
+            navigation.replace('ResidentScreen' , {Council : council.id});
             break;
           default:
             Alert.alert('Error', 'Unknown role.');
@@ -63,7 +63,7 @@ export default function CouncilCard({ route, council, navigation }) {
     <Card style={styles.card} onPress={checkUserType}>
       <Card.Content>
         <Title style={{ color : 'black', fontWeight : '700'}}>{council.Name}</Title>
-        <Paragraph style={{ color : 'black'}}>{council.Description}</Paragraph>
+        {/* <Paragraph style={{ color : 'black'}}>{council.Description}</Paragraph> */}
       </Card.Content>
     </Card>
   );
@@ -78,6 +78,6 @@ const styles = StyleSheet.create({
     height: '80%',
     borderRadius : 35,
     width: Dimensions.get('window').width - 25, 
-    backgroundColor : '#eab676'
+    backgroundColor : '#f5d8a0'
   },
 });

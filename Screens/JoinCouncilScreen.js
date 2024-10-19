@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {Text, TouchableOpacity ,Button, Image, SafeAreaView, StyleSheet, TextInput, useWindowDimensions, View, Alert } from 'react-native';
 import WavyBackground from '../Background/WavyBackground';
+import WavyBackground2 from '../Background/WavyBackground2';
 
 export default function JoinCouncil ({route, navigation}) {
   const { width } = useWindowDimensions(); // screen width
@@ -45,7 +46,7 @@ export default function JoinCouncil ({route, navigation}) {
   }
   return (
     <SafeAreaView style={styles.container}>
-      <WavyBackground />
+      <WavyBackground2 />
       
       <Text style={styles.header}>Let's Get Started by Creating or Joining a Council.</Text>
       <TouchableOpacity style={styles.button} onPress={handlePress}>
@@ -90,12 +91,13 @@ const styles = StyleSheet.create({
     bottom: 0, 
     width: '100%',
     alignItems: 'center',
+    zIndex : -1
   },
   button: {
     width: '90%',
     padding: 15,
     borderRadius: 25,
-    backgroundColor: '#F0C38E',
+    backgroundColor: '#f5d8a0',
     alignItems: 'center',
     marginBottom: 20,
   },

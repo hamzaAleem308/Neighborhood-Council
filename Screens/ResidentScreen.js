@@ -4,7 +4,7 @@ import WavyBackground from '../Background/WavyBackground';
 const screenWidth = Dimensions.get('window').width;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function ResidentScreen () {
+export default function ResidentScreen ({ navigation }) {
   const { width } = useWindowDimensions(); // screen width
  
   const [memberId, setMemberId] = useState(null);
@@ -71,7 +71,7 @@ export default function ResidentScreen () {
 
     {/* Buttons */}
     <View style={styles.buttonsContainer}>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate('ReportProblem')}}>
         <Image source={require('../assets/ReportProblem.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Report Issue</Text>
       </TouchableOpacity>

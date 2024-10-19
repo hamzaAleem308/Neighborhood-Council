@@ -13,13 +13,13 @@ export default function AdministrateElection ({ navigation, route }) {
      <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Create Election', {councilID: councilId})}}>
           <Text style={styles.signInButtonText}>Create New Election</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('NominateCandidate' , {councilID: councilId})}}>
+        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Nominate Candidate' , {councilID: councilId})}}>
             <Text style={styles.signInButtonText}>Nominate Candidates</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('ViewElection')}}>
+        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('View Election')}}>
             <Text style={styles.signInButtonText}>View Election</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('ElectionHistory')}}>
+        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Election History')}}>
             <Text style={styles.signInButtonText}>Election History</Text>
         </TouchableOpacity>
         <Image
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     width: '90%',
     padding: 15,
     borderRadius: 25,
-    backgroundColor: '#F0C38E',
+    backgroundColor: '#f5d8a0',
     alignItems: 'center',
     marginBottom: 20,
   },

@@ -12,56 +12,7 @@ import { IconButton } from 'react-native-paper';
 export default function Login({}){
   const [phoneNo, setPhoneNo] = useState('');
   const [password, setPassword] = useState('');
-
   const navigation= useNavigation();
-
-  // const storeUserData = async (userData) => {
-  //   try {
-  //     await AsyncStorage.setItem('userToken', JSON.stringify(userData));
-  //   } catch (error) {
-  //     console.error('Failed to save user data:', error);
-  //   }
-  // };
-
-
-  // const handlePress = async () => {
-  //   if(phoneNo.trim()&&password.trim()){
-  //   try {
-  //     let response = await fetch(`${baseURL}Account/Login?phoneNo=${phoneNo}&password=${password}`);
-  
-  //     let json = await response.json();
-  //     setData(json);
-  //     console.log('Response status:', response.status);
-  //     const token = 'LoggedIn'; //User Token to Check If logged in.
-  //     await AsyncStorage.setItem('userToken', token);
-  //     console.log('Token saved' + token)
-  //     if (response.ok) {
-  //       const userData = {
-  //   memberId: response.id,
-  //   // Other user data
-  // };
-  // await storeUserData(userData);
-  // console.log('Stored Id:  '+ userData.memberId)
-  //       Alert.alert(
-  //         'Welcome to the Portal',  
-  //         `${data.Full_Name}`,             
-  //         [
-  //           { text: 'OK', onPress: () => navigation.navigate('HomeScreen')}
-  //         ]
-  //       );
-  //     }
-  //     else {
-  //       Alert.alert('Error', 'No Member Registered with ' + phoneNo);
-        
-  //     }
-  //   } catch (error) {
-  //     Alert.alert('Error' , JSON.stringify(error));
-  //     Alert.alert('Error', 'Failed to save the token');
-  //   }
-  // }else{
-  //   Alert.alert('Please Enter your Credentials!')
-  // }
-  // };
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const { width } = useWindowDimensions();
   const [showPassword, setShowPassword] = useState(false); 
@@ -99,6 +50,10 @@ export default function Login({}){
 
   const handlePress = async () => {
     if (phoneNo.trim() && password.trim()) {
+      if (phoneNo.length != 11){
+        Alert.alert('Phone Number should be of 11 Characters')
+        return;
+      }
       try {
         const response = await fetch(`${baseURL}Account/Login?phoneNo=${phoneNo}&password=${password}`);
         const json = await response.json();
@@ -276,7 +231,7 @@ const styles = StyleSheet.create({
     width: '80%',
     padding: 15,
     borderRadius: 25,
-    backgroundColor: '#F0C38E',
+    backgroundColor: '#f5d8a0',
     alignItems: 'center',
     marginBottom: 20,
   },

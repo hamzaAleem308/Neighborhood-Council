@@ -104,9 +104,9 @@ export default function SignUp () {
                   DoB: dob,
                   Province: province,
                   City: city,
-                  Address: address, // Added missing address field
+                  Address: address, 
                   Password: password,
-                  Date_joined: new Date().toISOString(), // Changed Date.now to ISO string
+                  Date_joined: new Date().toISOString(), // Date.now to ISO stringv for storing Current Date.
                 }),
               });
         
@@ -217,17 +217,13 @@ export default function SignUp () {
         </TouchableOpacity>
       </View>
       </ScrollView>
-      <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.keyboardAvoidingView}>
+     
       <Image
           source={require('../assets/Footer.png')}
-          style={[styles.footer, { width: width }]} // image width to screen width
+          style={[styles.footer, { width: width,}]} // image width to screen width
           resizeMode="stretch" // Maintain aspect ratio
         />
-  </KeyboardAvoidingView>
     </SafeAreaView>
-  
   );
 };
 
@@ -274,7 +270,7 @@ const styles = StyleSheet.create({
     width: '80%',
     padding: 15,
     borderRadius: 25,
-    backgroundColor: '#F0C38E',
+    backgroundColor: '#f5d8a0',
     alignItems: 'center',
     marginBottom: 10,
   },
