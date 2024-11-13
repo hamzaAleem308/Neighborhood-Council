@@ -1,12 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Alert, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
-import { Button, Card, FAB } from 'react-native-paper';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, StyleSheet, Text, View, Image, useWindowDimensions } from 'react-native';
+import { Card, FAB } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import CouncilCard from '../Cards/CouncilCard';
-import { useFocusEffect } from '@react-navigation/native';
+import WavyBackground from '../Background/WavyBackground';
 
-export default function ProfileScreen({ route, navigation }) {
+export default function ProfileScreen({ navigation }) {
   const { width } = useWindowDimensions();
 
   const [memberId, setMemberId] = useState(null);
@@ -17,7 +15,6 @@ export default function ProfileScreen({ route, navigation }) {
   const [province, setProvince] = useState(null);
   const [city, setCity] = useState(null);
   const [address, setAddress] = useState(null);
-  const [password, setPassword] = useState(null);
   const [dateJoined, setDateJoined] = useState(null);
 
   useEffect(() => {
@@ -32,7 +29,6 @@ export default function ProfileScreen({ route, navigation }) {
         setProvince(userData.province);
         setCity(userData.city);
         setAddress(userData.address);
-        setPassword(userData.password);
         setDateJoined(userData.dateJoined);
       }
     };
@@ -49,124 +45,123 @@ export default function ProfileScreen({ route, navigation }) {
     }
   };
 
-//   useFocusEffect(
-//     useCallback(() => {
-//       GetCouncils();
-//     }, []) 
-//   );
-
- 
-
   return (
     <SafeAreaView style={styles.container}>
       <WavyBackground />
-      <View style={styles.container1}>
-      <Card style={styles.card}>
-        <Card.Content>
-          <Text style={styles.cardTitle}>{fullName}</Text>
-          <Text style={styles.cardContent}>Phone: {phoneNo}</Text>
-          <Text style={styles.cardContent}>Gender: {gender}</Text>
-          <Text style={styles.cardContent}>Date of Birth: {dateOfBirth}</Text>
-          <Text style={styles.cardContent}>Province: {province}</Text>
-          <Text style={styles.cardContent}>City: {city}</Text>
-          <Text style={styles.cardContent}>Address: {address}</Text>
-          <Text style={styles.cardContent}>Date Joined: {dateJoined}</Text>
-        </Card.Content>
-      </Card>
-      {/* <Button mode="contained" onPress={() => navigation.navigate('EditContact', { contact })} style={styles.button}>
-        Edit Contact
-      </Button>
-      <Button mode="outlined" onPress={() => navigation.goBack()} style={styles.button}>
-        Back to Contacts
-      </Button> */}
-    </View>
+      <Text style={[styles.header, {top: 100} ]}>User Profile</Text>
+      <View style={styles.profileContainer}>
+        <Card style={styles.card}>
+          <Card.Content>
+            <Text style={styles.cardTitle}>{fullName || 'User Name'}</Text>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>Phone:</Text>
+              <Text style={styles.value}>{phoneNo}</Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>Gender:</Text>
+              <Text style={styles.value}>{gender === 'M'? 'Male' : 'Female'}</Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>Date of Birth:</Text>
+              <Text style={styles.value}>{new Date(dateOfBirth).toDateString()}</Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>Province:</Text>
+              <Text style={styles.value}>{province}</Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>City:</Text>
+              <Text style={styles.value}>{city}</Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>Address:</Text>
+              <Text style={styles.value}>{address}</Text>
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.label}>Date Joined:</Text>
+              <Text style={styles.value}>{new Date(dateJoined).toDateString()}</Text>
+            </View>
+          </Card.Content>
+        </Card>
+      </View>
+
       <Image
         source={require('../assets/Footer.png')}
         style={[styles.footer, { width: width }]}
         resizeMode="stretch"
+      />
+
+      <FAB
+        style={styles.fab}
+        color="#000"
+        icon="pencil"
+        onPress={{}}
       />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff', // Light background color for contrast
-        padding: 100,
-      },
-    //   container1: {
-    //     flex: 1,
-    //     backgroundColor: '#fff', // Light background color for contrast
-    //     padding: 16,
-    //   },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff', // White background for freshness
+    padding: 10,
+  },
+  profileContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 0,
+    paddingHorizontal: 20,
+  },
+  header: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 20,
+    color: 'black',
+  },
   card: {
-    backgroundColor: '#fff', // White background for the card
-    borderRadius: 16,
-    padding: 5,
-    shadowColor: '#000', // Shadow for a modern, raised card look
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5, // Elevation for Android shadow
-    top: 50
+    width: '100%',
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
   },
   cardTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#007bff', // Eye-catching color for the title
+    color: '#000',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 8,
   },
-  cardContent: {
+  label: {
     fontSize: 16,
-    color: '#555', // Gray color for secondary text
-    marginBottom: 4,
-  },
-  headerContainer: {
-    alignItems: 'center',
-    marginTop: 50,
-    marginBottom: 20,
-  },
-  headerText: {
-    fontFamily: 'KronaOne-Regular',
-    fontSize: 35,
     color: '#000',
-    marginBottom: 5,
+    fontWeight: '600',
   },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: 0,
-    paddingBottom: 150,
-  },
-  listContent: {
-    paddingBottom: 20,
-  },
-  cardContainer: {
-    borderRadius: 20,
-    padding: 10,
-   
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 90,
-    backgroundColor: '#F0C38E',
-  },
-  fab1: {
-    position: 'absolute',
-    left: 20,
-    bottom: 90,
-    backgroundColor: '#F0C38E',
-  },
-  fab2: {
-    position: 'absolute',
-    left: 90,
-    bottom: 90,
-    backgroundColor: '#F0C38E',
+  value: {
+    fontSize: 16,
+    color: '#000',
   },
   footer: {
     position: 'absolute',
     bottom: 0,
     zIndex: -1,
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 90,
+    backgroundColor: '#f5d8a0', 
   },
 });

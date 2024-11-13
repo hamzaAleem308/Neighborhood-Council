@@ -1,3 +1,4 @@
+import { NavigationContainer } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Alert, Image } from 'react-native';
 
@@ -18,7 +19,8 @@ const[password, setPassword]= useState('');
       Alert.alert('Enter All things')
     }
   }
-  return (
+
+    return (
     <View style={styles.container}>
       <ImageBackground source={require('./background.png') } style={styles.background}>
       <View style={styles.logoContainer}>

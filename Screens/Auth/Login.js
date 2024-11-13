@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Text, Alert, SafeAreaView, TouchableOpacity, View, TextInput, StyleSheet, ImageBackground, Image, Dimensions, useWindowDimensions, KeyboardAvoidingView, ScrollView } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
-import  baseURL  from './Api';
+import { Text, Alert, SafeAreaView, TouchableOpacity, View, TextInput, StyleSheet, ImageBackground, Image, Dimensions, useWindowDimensions, KeyboardAvoidingView, ScrollView, ActivityIndicator } from 'react-native';
+import WavyBackground from '../../Background/WavyBackground';
+import  baseURL  from '../Api';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LoadingScreen from './LoadingScreen';
-import HomeScreen from './Home';
+import LoadingScreen from '../LoadingScreen';
+import HomeScreen from '../Home';
 import { IconButton } from 'react-native-paper';
 
 
@@ -16,6 +16,7 @@ export default function Login({}){
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const { width } = useWindowDimensions();
   const [showPassword, setShowPassword] = useState(false); 
+  const [loading, setLoading] = useState(false);
   
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -30,15 +31,15 @@ export default function Login({}){
     checkLoginStatus();
   }, []);
 
-  if (isLoggedIn === null) {
-    return <LoadingScreen />;
-   }
+  // if (isLoggedIn === null) {
+  //   return <LoadingScreen />;
+  //  }
 
-  isLoggedIn ? (
-    <HomeScreen navigation={navigation} />
-  ) : (
-    <Login navigation={navigation} />
-  );
+  // isLoggedIn ? (
+  //   <HomeScreen navigation={navigation} />
+  // ) : (
+  //   <Login navigation={navigation} />
+  // );
 
   const storeUserData = async (userData) => {
     try {
@@ -55,6 +56,8 @@ export default function Login({}){
         return;
       }
       try {
+        setLoading(true)
+        await new Promise(resolve => setTimeout(resolve, 2000));
         const response = await fetch(`${baseURL}Account/Login?phoneNo=${phoneNo}&password=${password}`);
         const json = await response.json();
 
@@ -82,7 +85,7 @@ export default function Login({}){
           Alert.alert(
             'Welcome to the Portal',
             `${userData.fullName}`,
-            [{ text: 'OK', onPress: () => navigation.navigate('HomeScreen',{ memberID : userData.memberId}) }]
+            [{ text: 'OK', onPress: () => navigation.replace('HomeScreen',{ memberID : userData.memberId}) }]
           );
         } else if(response.status === 401) {
           Alert.alert('Error', 'Incorrect Password');
@@ -97,6 +100,7 @@ export default function Login({}){
     } else {
       Alert.alert('Please Enter your Credentials!');
     }
+    setLoading(false)
   };
   return (
     
@@ -105,7 +109,7 @@ export default function Login({}){
       <View style={styles.logoContainer}>
           <View style={styles.logo}>
             {/* Icon placeholder */}
-            <Image source={require('../assets/UserProfile.png')} style={styles.image}></Image>
+            <Image source={require('../../assets/UserProfile.png')} style={styles.image}></Image>
           </View>
         </View>
         <View>
@@ -131,16 +135,20 @@ export default function Login({}){
         {/* <TouchableOpacity>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity> */}
-        <TouchableOpacity style={styles.signInButton} onPress={handlePress}>
-          <Text style={styles.signInButtonText}>Sign In</Text>
-        </TouchableOpacity>
+       <TouchableOpacity style={styles.signInButton} onPress={handlePress} disabled={loading}>
+      {loading ? (
+        <ActivityIndicator size="small" color="#000" />
+      ) : (
+        <Text style={styles.signInButtonText}>Sign In</Text>
+      )}
+    </TouchableOpacity>
         <TouchableOpacity>
           <Text style={styles.signUpText}>
             Don’t have an account? <Text style={styles.signUpLink} onPress={() => navigation.navigate('SignUp')}>Sign Up!</Text>
           </Text>
         </TouchableOpacity>
         <Image
-          source={require('../assets/Footer.png')}
+          source={require('../../assets/Footer.png')}
           style={[styles.footer, { width: width }]} // image width to screen width
           resizeMode="stretch" // Maintain aspect ratio
         />

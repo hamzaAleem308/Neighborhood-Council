@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, Image, SafeAreaView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
-import DividerLine from '../Background/LineDivider';
+import WavyBackground from '../../Background/WavyBackground';
+import DividerLine from '../../Background/LineDivider';
 
 export default function AdministrateElection ({ navigation, route }) {
   const { width } = useWindowDimensions(); // screen width
@@ -16,14 +16,14 @@ export default function AdministrateElection ({ navigation, route }) {
         <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Nominate Candidate' , {councilID: councilId})}}>
             <Text style={styles.signInButtonText}>Nominate Candidates</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('View Election')}}>
+        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('View Election' , {councilID: councilId})}}>
             <Text style={styles.signInButtonText}>View Election</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Election History')}}>
+        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Election History' , {councilID: councilId})}}>
             <Text style={styles.signInButtonText}>Election History</Text>
         </TouchableOpacity>
         <Image
-          source={require('../assets/Footer.png')}
+          source={require('../../assets/Footer.png')}
           style={[styles.footer, { width: width }]}
           resizeMode="stretch" 
         />

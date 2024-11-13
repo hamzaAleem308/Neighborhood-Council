@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Text, Image, SafeAreaView, StyleSheet, TouchableOpacity, useWindowDimensions, View, Alert } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
-import DividerLine from '../Background/LineDivider';
+//import WavyBackground from '../Background/WavyBackground';
+import DividerLine from '../../Background/LineDivider';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import WavyBackground2 from '../Background/WavyBackground2';
+import WavyBackground2 from '../../Background/WavyBackground2';
 
 export default function AdminScreen ({ route }) {
   const { width } = useWindowDimensions(); // screen width
@@ -108,30 +108,28 @@ return (
     <View style={styles.iconRow}>
       <TouchableOpacity onPress={() => navigation.navigate('Invite Resident', { councilId: Council })}>
         <View style={styles.iconContainer}>
-          <Image source={require('../assets/JoinLink.png')} style={styles.icon} />
+          <Image source={require('../../assets/JoinLink.png')} style={styles.icon} />
         <Text style={styles.iconLabel}>Invite</Text>
       </View>
       </TouchableOpacity>
       {/* Announcement Icon */}
-      <TouchableOpacity onPress={() => navigation.navigate('Announcement', {})}>
+      <TouchableOpacity onPress={() => navigation.navigate('Announcement', {councilId: Council})}>
         <View style={styles.iconContainer}>
-          <Image source={require('../assets/announcement.png')} style={styles.icon} />
+          <Image source={require('../../assets/announcement.png')} style={styles.icon} />
           <Text style={styles.iconLabel}>Announce</Text>
         </View>
       </TouchableOpacity>
       {/* Election Icon */}
     <TouchableOpacity onPress={() => navigation.navigate('Administrate Election', { councilId: Council })}>
       <View style={styles.iconContainer}>
-        <Image source={require('../assets/election.png')} style={styles.icon} />
+        <Image source={require('../../assets/election.png')} style={styles.icon} />
         <Text style={styles.iconLabel}>Election</Text>
       </View>
     </TouchableOpacity>
   </View>
 
   <DividerLine />
-
   <Text style={styles.desc}>Description: {councilData?.Description || 'Loading...'}</Text>
-
   <DividerLine />
 
   <TouchableOpacity style={styles.signInButton} onPress={{}}>
@@ -148,7 +146,7 @@ return (
   </TouchableOpacity>
 
   <Image
-          source={require('../assets/Footer.png')}
+          source={require('../../assets/Footer.png')}
           style={[styles.footer, { width: width }]} // image width to screen width
           resizeMode="stretch" // Maintain aspect ratio
         />
@@ -203,7 +201,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'black',
     textAlign: 'center',
-    marginVertical: 20,
+    marginVertical: 15,
   },
   signInButton: {
     width: '100%',

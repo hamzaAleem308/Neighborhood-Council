@@ -1,9 +1,9 @@
 import React from "react";
 import { PaperProvider } from "react-native-paper";
-import LoginScreen from "./Login";
+import LoginScreen from "./Auth/Login";
 import SplashScreen from "./SplashScreen";
 import Template from "./BackgroundTemplate";
-import SignUp from "./SignUp";
+import SignUp from "./Auth/SignUp";
 import SetupNavigation from "./Navigation";
 import LoadingScreen from "./LoadingScreen"
 import HomeScreen from "./Home";

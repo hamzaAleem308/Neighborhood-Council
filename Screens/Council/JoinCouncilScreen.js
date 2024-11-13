@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {Text, TouchableOpacity ,Button, Image, SafeAreaView, StyleSheet, TextInput, useWindowDimensions, View, Alert } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
-import WavyBackground2 from '../Background/WavyBackground2';
+import {Text, TouchableOpacity ,Button, Image, SafeAreaView, StyleSheet, TextInput, useWindowDimensions, View, Alert, ActivityIndicator } from 'react-native';
+import WavyBackground from '../../Background/WavyBackground';
+import WavyBackground2 from '../../Background/WavyBackground2';
 
 export default function JoinCouncil ({route, navigation}) {
   const { width } = useWindowDimensions(); // screen width
   const [councilLink, setCouncilLink] = useState('');
- const { memberID } = route.params;
- 
+  const { memberID } = route.params;
+  const [loading, setLoading] = useState(false)
 
   const JoinCouncilUsingJoinCode = async () => {
     if(!councilLink){
@@ -15,6 +15,8 @@ export default function JoinCouncil ({route, navigation}) {
       return;
     }
     try {
+      setLoading(true)
+      await new Promise(resolve => setTimeout(resolve, 2000))
       const response = await fetch(`${baseURL}Council/JoinCouncilUsingCode?memberId=${memberID}&joinCode=${councilLink}`, {
         method: 'Post',
         headers: {
@@ -39,6 +41,7 @@ export default function JoinCouncil ({route, navigation}) {
     } catch (error) {
       Alert.alert('Error', 'No Councils Associated with this Code');
     }
+    setLoading(false)
   };
 
   const handlePress = async()=>{
@@ -52,14 +55,18 @@ export default function JoinCouncil ({route, navigation}) {
       <TouchableOpacity style={styles.button} onPress={handlePress}>
           <Text style={styles.buttonText}>Create Council</Text>
         </TouchableOpacity>
-        <Text style={{color: 'black', textAlign : 'center', fontSize: 20 , margin:8}}>OR  </Text>
+        <Text style={{color: 'black', textAlign : 'center', fontSize: 18 , margin:8}}>OR  </Text>
       <TextInput style={styles.input} placeholder="Enter Code Here!" onChangeText={setCouncilLink} placeholderTextColor="#0007" />
-      <TouchableOpacity style={styles.button} onPress={JoinCouncilUsingJoinCode}>
-          <Text style={styles.buttonText}>Join Council</Text>
+      <TouchableOpacity style={styles.button} onPress={JoinCouncilUsingJoinCode} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator size={'small'} color={'#000'}/>
+          ):(
+            <Text style={styles.buttonText}>Join Existing Council</Text>
+          )}  
         </TouchableOpacity>
         <View style={styles.footerContainer}>
         <Image
-          source={require('../assets/Footer.png')}
+          source={require('../../assets/Footer.png')}
           style={[{ width: width }]} // image width to screen width
           resizeMode="stretch" // Maintain aspect ratio
         />

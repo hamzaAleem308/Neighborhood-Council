@@ -1,11 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, Image, SafeAreaView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
-import DividerLine from '../Background/LineDivider';
+import WavyBackground from '../../Background/WavyBackground';
+import DividerLine from '../../Background/LineDivider';
+import { FAB } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function MeetingScreen (Council) {
+export default function MeetingScreen ({Council, navigation}) {
   const { width } = useWindowDimensions(); // screen width
-  
+  const [memberId, setMemberId] = useState(0)
+  const getData = async () => {
+    const userDataString = await AsyncStorage.getItem('userData'); 
+        if (userDataString !== null) {
+          const userData = JSON.parse(userDataString); // Parse userData from string
+          if (userData && userData.memberId) {
+            setMemberId(userData.memberId)
+          }
+        }
+        }
+        useEffect(() => {
+          getData()
+        },[])
   return (
     <SafeAreaView style={styles.container}>
       <WavyBackground />
@@ -23,7 +37,7 @@ export default function MeetingScreen (Council) {
         onPress={() => navigation.navigate('ScheduleMeeting', { memberID: memberId })}
       />
         <Image
-          source={require('../assets/Footer.png')}
+          source={require('../../assets/Footer.png')}
           style={[styles.footer, { width: width }]}
           resizeMode="stretch" 
         />

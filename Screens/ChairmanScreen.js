@@ -4,7 +4,7 @@ import WavyBackground from '../Background/WavyBackground';
 const screenWidth = Dimensions.get('window').width;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function ResidentScreen ({ route, navigation }) {
+export default function ChairmanScreen ({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
   const {council, councilName, councilDescription} = route.params;
   
@@ -19,9 +19,9 @@ export default function ResidentScreen ({ route, navigation }) {
   const [password, setPassword] = useState(null);
   const [dateJoined, setDateJoined] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
-
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -108,17 +108,21 @@ export default function ResidentScreen ({ route, navigation }) {
 
     {/* Buttons */}
     <View style={styles.buttonsContainer}>
-      <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate('ReportProblem')}}>
+      <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate('ReportProblem', {councilId : council, memberId : memberId})}}>
         <Image source={require('../assets/ReportProblem.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Report Issue</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
-        <Image source={require('../assets/votepng.png')} style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>Vote Now!</Text>
+      <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate('Meeting', {councilId : council, memberId : memberId})}}> 
+        <Image source={require('../assets/meetings.png')} style={styles.buttonIcon} />
+        <Text style={styles.buttonText}>Meetings</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button}>
         <Image source={require('../assets/projects.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Projects</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button}>
+        <Image source={require('../assets/ViewIssues.png')} style={styles.buttonIcon} />
+        <Text style={styles.buttonText}>View Problems</Text>
       </TouchableOpacity>
     </View>
     <Image
@@ -167,6 +171,7 @@ buttonsContainer: {
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
+  bottom: 20
 },
 button: {
   width: screenWidth * 0.7, 

@@ -190,11 +190,11 @@
 //   }
 // });
 import React, { useState } from 'react';
-import { TouchableOpacity, TextInput, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, Alert, KeyboardAvoidingView } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
+import { TouchableOpacity, TextInput, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, Alert, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import WavyBackground from '../../Background/WavyBackground';
 import { ScrollView } from 'react-native-gesture-handler';
 import DatePicker from 'react-native-date-picker';
-import baseURL from './Api';
+import baseURL from '../Api';
 
 export default function CreateElection({ navigation, route }) {
   const { width } = useWindowDimensions(); // screen width
@@ -208,10 +208,12 @@ export default function CreateElection({ navigation, route }) {
 
   const [sdData, setSdData] = useState('SELECT START DATE');
   const [edData, setEdData] = useState('SELECT END DATE');
+  const [loading, setLoading] = useState(false);
   
   const currentDate = new Date(); //Current date initialized to check whether Date is in future
   
   const addElection = async () => {
+    setLoading(true)
     const eData = {
       Name: electionName,
       status: "Ongoing",
@@ -221,6 +223,7 @@ export default function CreateElection({ navigation, route }) {
     };
 
     try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
       const response = await fetch(`${baseURL}Election/InitiateElection`, {
         method: 'POST',
         headers: {
@@ -231,7 +234,7 @@ export default function CreateElection({ navigation, route }) {
 
       if (response.ok) {
         Alert.alert('Success!', 'Election Added Successfully, Now select Candidates for Election!', 
-            [{ text: 'OK', onPress: () => navigation.navigate('Nominate Candidate', {councilID: councilID})}]);
+            [{ text: 'OK', onPress: () => navigation.replace('Nominate Candidate', {councilID: councilID})}]);
         console.log('Election Added Successfully');
       } else {
         Alert.alert('Error', 'Failed to create election');
@@ -242,6 +245,7 @@ export default function CreateElection({ navigation, route }) {
       Alert.alert('Error', 'An error occurred');
       console.log('Error:', error);
     }
+    setLoading(false)
   };
 
   const handlePress = () => {
@@ -326,9 +330,13 @@ export default function CreateElection({ navigation, route }) {
             onCancel={() => setEndDatePickerOpen(false)}
           />
           {/* Create Election Button */}
-          <TouchableOpacity style={styles.signUpButton} onPress={handlePress}>
-            <Text style={styles.signUpButtonText}>Create Election</Text>
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.signUpButton} onPress={handlePress} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator size={'small'} color={'#000'}/> 
+            ) : (
+              <Text style={styles.signUpButtonText}>Create Election</Text>
+            )}
+            </TouchableOpacity>
         </View>
       </ScrollView>
       <KeyboardAvoidingView
@@ -336,7 +344,7 @@ export default function CreateElection({ navigation, route }) {
         style={styles.keyboardAvoidingView}
       >
         <Image
-          source={require('../assets/Footer.png')}
+          source={require('../../assets/Footer.png')}
           style={[styles.footer, { width: width }]} // image width to screen width
           resizeMode="stretch" // Maintain aspect ratio
         />

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import WavyBackground from '../../Background/WavyBackground';
 import { Button } from 'react-native-paper';
-import WavyBackground2 from '../Background/WavyBackground2';
+import WavyBackground2 from '../../Background/WavyBackground2';
 
 export default function CreateCouncil({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
@@ -10,6 +10,7 @@ export default function CreateCouncil({ route, navigation }) {
   const memberId = Id
   const [name, setName]= useState('');
   const [desc,  setDesc] = useState('');
+  const [loading, setLoading] = useState(false)
 
   const generateJoinCode = (memberId) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -31,11 +32,10 @@ export default function CreateCouncil({ route, navigation }) {
     const post = {
         Name: name,
         Description: desc,
-        Date: new Date().toISOString(),
-        JoinCode : code
     };
-
+    setLoading(true)
     try {
+      await new Promise(resolve => setTimeout(resolve, 2000))
         const response = await fetch(`${baseURL}Council/PostCouncils?memberId=${Id}`, {
             method: 'POST',
             headers: {
@@ -57,6 +57,7 @@ export default function CreateCouncil({ route, navigation }) {
     } catch (error) {
         Alert.alert('An error occurred while creating the post.');
     }
+    setLoading(false)
 }
 
 
@@ -67,7 +68,7 @@ export default function CreateCouncil({ route, navigation }) {
       <Text style={styles.header}>Create a Council</Text>
         <View style={styles.logoContainer}>
         <View style={styles.logo}>
-            <Image source={require('../assets/group.png')} style={styles.image}></Image>
+            <Image source={require('../../assets/group.png')} style={styles.image}></Image>
           </View>
         </View>
         
@@ -81,12 +82,16 @@ export default function CreateCouncil({ route, navigation }) {
         keyboardType="default"
         onChangeText={setDesc} 
         placeholderTextColor="#000" />
-        <TouchableOpacity style={styles.signInButton} onPress={CreateCouncil}>
-          <Text style={styles.signInButtonText}>Create</Text>
-        </TouchableOpacity>
+       <TouchableOpacity style={styles.signInButton} onPress={CreateCouncil} disabled={loading}>
+      {loading ? (
+        <ActivityIndicator size="small" color="#000" />
+      ) : (
+        <Text style={styles.signInButtonText}>Create</Text>
+      )}
+    </TouchableOpacity>
       </View>
       <View style={styles.footerContainer}>
-        <Image source={require('../assets/Footer.png')} style={styles.footerImage}></Image>
+        <Image source={require('../../assets/Footer.png')} style={styles.footerImage}></Image>
       </View>
     </SafeAreaView>
   );
@@ -153,7 +158,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'black',
     height: 150,
-    paddingBottom : 110,
+    paddingBottom : 20,
     textAlignVertical: 'top',
     },
   signInButton: {
@@ -173,6 +178,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     alignItems: 'center',
+    zIndex: -1
   },
   footerImage: {
     width: '100%',

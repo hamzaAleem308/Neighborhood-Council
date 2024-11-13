@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Text, Image, SafeAreaView, StyleSheet, TouchableOpacity, useWindowDimensions, View, TextInput, Share, Alert,  } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
-import DividerLine from '../Background/LineDivider';
-import baseURL  from './Api';
+import { Text, Image, SafeAreaView, StyleSheet, TouchableOpacity, useWindowDimensions, View, TextInput, Share, Alert, ActivityIndicator,  } from 'react-native';
+import WavyBackground from '../../Background/WavyBackground';
+import DividerLine from '../../Background/LineDivider';
+import baseURL  from '../Api';
 
 export default function InviteMember ( {route} ) {
   const { width } = useWindowDimensions(); // screen width
   const[link, setLink] = useState({});
   const {councilId} = route.params
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getJoinCode = async () => {
@@ -28,15 +29,18 @@ export default function InviteMember ( {route} ) {
     getJoinCode();
   }, [councilId]);
 
-  const handlePress = () => {
+  const handlePress = async() => {
+    setLoading(true)
     if (link) {
-      const joinCodeMessage = `Join *${link.Name}* using this code within the Neighborhood Council App under Join Council\n\n${link.JoinCode}`;
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const joinCodeMessage = `You’ve been invited to join *${link.Name}*!\n\nUse the code below within the Neighborhood Council App under “Join Council” to get started.\n\n*Join Code*: ${link.JoinCode}`;
       Share.share({
         message: joinCodeMessage,
       }).catch((error) => console.log('Error sharing the link', error));
     } else {
       Alert.alert('Error', 'No join code available to share');
     }
+    setLoading(false)
   };
   
 
@@ -48,11 +52,15 @@ export default function InviteMember ( {route} ) {
     <View style={styles.signInButton1}> 
         <Text style={styles.signInButtonText1}>{link?.JoinCode || 'Loading...'}</Text>
       </View>
-        <TouchableOpacity style={styles.signInButton} onPress={handlePress}>
-            <Text style={styles.signInButtonText}>Share Join Code!</Text>
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.signInButton} onPress={handlePress} disabled={loading}>
+      {loading ? (
+        <ActivityIndicator size="small" color="#000" />
+      ) : (
+        <Text style={styles.signInButtonText}>Share Join Code!</Text>
+      )}
+    </TouchableOpacity>
         <Image
-          source={require('../assets/Footer.png')}
+          source={require('../../assets/Footer.png')}
           style={[styles.footer, { width: width }]}
           resizeMode="stretch" 
         />

@@ -1,43 +1,50 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Text, Alert, SafeAreaView, View, StyleSheet, Image, useWindowDimensions, KeyboardAvoidingView, ScrollView, FlatList } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
-import  baseURL  from './Api';
+import WavyBackground from '../../Background/WavyBackground';
+import  baseURL  from '../Api';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import ElectionCard from '../Cards/ElectionCard';
+import ElectionCard from '../../Cards/ElectionCard';
 
-export default function NominateCandidate({ route }){
-  const navigation= useNavigation();
+export default function NominateCandidate({ route, navigation }){
+
   const { width } = useWindowDimensions();
-  const [electionData, setElectionData] = useState({});
+  const [electionData, setElectionData] = useState([]);
   const {councilID} = route.params;
-
+  const [isInitiated, setIsInitiated] = useState(false)
   const getElections = async () => {
     try {
       const response = await fetch(`${baseURL}election/getElection?councilId=${councilID}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', 
         },
       });
       if (response.ok) {
         const json = await response.json();
-       
+        console.log(json)
         setElectionData(json);
-      }
-      else{
-        Alert.alert('Error', 'Failed to load Data');
       }
     } catch (error) {
       Alert.alert('Error', 'An error occurred while loading Data');
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-     getElections();
-    }, [councilID]) 
-  );
+  useEffect(() => {
+    if (electionData.length > 0) {
+      const iniElection = electionData.find((ele) => ele.status === "Initiated");
+      if (iniElection) {
+        setIsInitiated(true)
+        console.log('Election Found')
+      } else {
+        console.log('No Election found or an Active Election.')
+        setIsInitiated(false);
+      }
+    }
+  }, [electionData]);
 
+  useEffect(() => {
+    getElections();
+  }, [councilID])
 
   const renderElectionCard = ({ item }) => (
     <View style={styles.cardContainer}>
@@ -52,24 +59,30 @@ export default function NominateCandidate({ route }){
         <Text style={styles.headerText}>Neighborhood</Text>
         <Text style={styles.headerText}>Council</Text>
       </View> */}
- <Text style={styles.header}>Nominate Candidates for Ongoing Election</Text>
+      <Text style={styles.header}>Nominate Candidates for Ongoing Election</Text>
       <View style={styles.contentContainer}>
-        <FlatList
+        {isInitiated? (   
+          <FlatList
           data={electionData}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderElectionCard}
           ListEmptyComponent={
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               <Text style={{ textAlign: 'center', color: 'black', fontSize: 20 }}>
-               No Elections Started 
+               No Elections Initiated or An Election is in progress.
               </Text>
             </View>
           }
           contentContainerStyle={styles.listContent}
         />
+      ):(
+          <Text style={{ textAlign: 'center', color: 'black', fontSize: 20 }}>
+               No Elections Initiated or An Election is in progress.
+              </Text>
+        )}
       </View>
         <Image
-          source={require('../assets/Footer.png')}
+          source={require('../../assets/Footer.png')}
           style={[styles.footer, { width: width }]} // image width to screen width
           resizeMode="stretch" // Maintain aspect ratio
         />

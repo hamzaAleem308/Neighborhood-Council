@@ -6,15 +6,15 @@ export default function ElectionCard({ council, election, navigation }) {
   //const [ council ] = route.params;
 
   return (
-    <Card style={styles.card} onPress={() =>navigation.navigate('CreateNominees', {electionName: election.Name, electionId: election.id, councilId: council })}>
+    <Card style={styles.card} onPress={() =>navigation.replace('CreateNominees', {electionName: election.Name, electionId: election.id, councilId: council })}>
       <Card.Content>
         <Title style={styles.title}>{election.Name}</Title>
         <Paragraph style={styles.text}>Status: {election.status}</Paragraph>
         <Paragraph style={styles.subtitle}>Start Date</Paragraph>
-        <Paragraph style={styles.text}>{election.StartDate}</Paragraph>
+        <Paragraph style={styles.text}>{new Date(election.StartDate).toLocaleString()}</Paragraph>
         <View style={styles.view}>
           <Paragraph style={styles.subtitle}>End Date</Paragraph>
-          <Paragraph style={styles.text}>{election.EndDate}</Paragraph>
+          <Paragraph style={styles.text}>{new Date(election.EndDate).toLocaleString()}</Paragraph>
           <Paragraph style={styles.manageText}>Click to manage Election!</Paragraph>
         </View>
       </Card.Content>

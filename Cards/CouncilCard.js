@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Title, Paragraph } from 'react-native-paper';
-import { StyleSheet, Dimensions, Alert } from 'react-native';
+import { StyleSheet, Dimensions, Alert, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DividerLine from '../Background/LineDivider';
 
 export default function CouncilCard({ route, council, navigation }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,11 +37,14 @@ export default function CouncilCard({ route, council, navigation }) {
       if (response.ok) {
         switch (role) {
           case 'Admin':
-            navigation.replace('AdminScreen', {Council : council.id});
+            navigation.navigate('AdminScreen', {Council : council.id});
             break;
           case 'Member':
-            navigation.replace('ResidentScreen' , {Council : council.id});
+            navigation.navigate('ResidentScreen' , {Council : council.id, councilName : council.Name, councilDescription: council.Description});
             break;
+          case 'Chairperson':
+          navigation.navigate('ChairmanScreen' , {Council : council.id, councilName : council.Name, councilDescription: council.Description});
+          break;
           default:
             Alert.alert('Error', 'Unknown role.');
         }
@@ -60,24 +64,33 @@ export default function CouncilCard({ route, council, navigation }) {
   // }, [navigation]);
 
   return (
+    <View style={styles.view}>
+
     <Card style={styles.card} onPress={checkUserType}>
       <Card.Content>
         <Title style={{ color : 'black', fontWeight : '700'}}>{council.Name}</Title>
         {/* <Paragraph style={{ color : 'black'}}>{council.Description}</Paragraph> */}
       </Card.Content>
     </Card>
+    <DividerLine/>
+    </View>
   );
 }
 
 //onPress={() => navigation.navigate('Table', { council: council.id })}
 
 const styles = StyleSheet.create({
+  view:{
+    justifyContent: 'center',
+    alignItems : 'center'
+  },
   card: {
     flex: 1,
     marginRight: 2,
     height: '80%',
-    borderRadius : 35,
+    borderRadius : 20,
     width: Dimensions.get('window').width - 25, 
-    backgroundColor : '#f5d8a0'
+    backgroundColor : '#f5d8a0',
+    
   },
 });

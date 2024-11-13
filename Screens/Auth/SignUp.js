@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, TextInput, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, Alert, KeyboardAvoidingView } from 'react-native';
-import WavyBackground from '../Background/WavyBackground';
+import { TouchableOpacity, TextInput, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, Alert, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import WavyBackground from '../../Background/WavyBackground';
 import { useNavigation } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { ScrollView } from 'react-native-gesture-handler';
 import DatePicker from 'react-native-date-picker';
-import  baseURL  from './Api';
+import  baseURL  from '../Api';
 
 export default function SignUp () {
   const { width } = useWindowDimensions(); // screen width
@@ -64,6 +64,8 @@ export default function SignUp () {
     {  label: 'Balochistan', value: 'Balochistan'},
     {  label: 'Gilgit Baltistan', value: 'Gilgit Baltistan'}, 
       ];
+    const [loading, setLoading] = useState(false);
+
   const [dobData, setDobData] = useState('Select Date of Birth');
       const saveMember = async () => {
         if (
@@ -78,7 +80,7 @@ export default function SignUp () {
         Alert.alert('Please Fill All Fields!')
         return;
         }
-          if (phoneNo.length != 11 ) {
+          if (phoneNo.length !== 11 ) {
             Alert.alert('Invalid Phone Number', 'Phone number must be 11 characters long.');
           return;
           }
@@ -91,7 +93,9 @@ export default function SignUp () {
             Alert.alert('Passwords Do Not Match');
             return;
           }
+          setLoading(true)
             try {
+              await new Promise(resolve => setTimeout(resolve, 2000))
               const response = await fetch(`${baseURL}Account/SignUp`, {
                 method: 'POST',
                 headers: {
@@ -119,14 +123,15 @@ export default function SignUp () {
                 );
               } else {
                 Alert.alert('Error', 'User already exists! Try Signing In.' );
-                console.log('Response Status:', response.status); // Log status code
-                console.log('Response Body:', await response.text()); // Log response body for debugging
+                console.log('Response Status:', response.status);
+                console.log('Response Body:', await response.text()); 
               console.log(phoneNo, fname, gender, dob, city, province, address, password, confirmPassword )
               }
             } catch (error) {
               Alert.alert('Error', 'An error occurred');
-              console.log('Error:', error); // Log error for debugging
+              console.log('Error:', error);
             }
+            setLoading(false)
       };
       
   return (
@@ -207,9 +212,13 @@ export default function SignUp () {
         <TextInput style={styles.input} placeholder="Address" keyboardType="default" onChangeText={setAddress} placeholderTextColor="#000" />
         <TextInput style={styles.input} placeholder="Password" keyboardType="default" onChangeText={setPassword} placeholderTextColor="#000" />
         <TextInput style={styles.input} placeholder="Confirm Password" keyboardType="default" onChangeText={setConfirmPassword} placeholderTextColor="#000" />
-        <TouchableOpacity style={styles.signUpButton} onPress={saveMember} >
-          <Text style={styles.signUpButtonText} >Sign Up</Text>
-        </TouchableOpacity>
+        <TouchableOpacity style={styles.signUpButton} onPress={saveMember} disabled={loading}>
+      {loading ? (
+        <ActivityIndicator size="small" color="#000" />
+      ) : (
+        <Text style={styles.signUpButtonText}>Sign Up</Text>
+      )}
+    </TouchableOpacity>
         <TouchableOpacity>
           <Text style={styles.signInText}>
            Already have an account? <Text style={styles.signInLink} onPress={()=> navigation.navigate("Login")}>Sign In!</Text>
@@ -219,7 +228,7 @@ export default function SignUp () {
       </ScrollView>
      
       <Image
-          source={require('../assets/Footer.png')}
+          source={require('../../assets/Footer.png')}
           style={[styles.footer, { width: width,}]} // image width to screen width
           resizeMode="stretch" // Maintain aspect ratio
         />
@@ -232,12 +241,12 @@ const styles = StyleSheet.create({
   
   
     textContainer:{
-      top : 0,
+      top : 10,
      flex : 1,
      alignItems : 'center',
      position : 'relative',
      justifyContent : 'center',
-     bottom : 0,
+     marginBottom : 20,
     },
     input: {
       width: '80%',
