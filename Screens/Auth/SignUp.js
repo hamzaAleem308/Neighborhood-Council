@@ -238,8 +238,6 @@ export default function SignUp () {
 
 
 const styles = StyleSheet.create({
-  
-  
     textContainer:{
       top : 10,
      flex : 1,

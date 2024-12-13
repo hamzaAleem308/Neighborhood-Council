@@ -141,10 +141,10 @@ useEffect(() => {
       fetchElectionData()
       console.log('Election is Active')
     } 
-    const InitiatedElection = electionData.find((ele) => ele.ElectionStatus === 'Initiated')
-    if(InitiatedElection){
+    const initiatedElection = electionData.find((ele) => ele.ElectionStatus === 'Initiated')
+    if(initiatedElection){
       console.log('Election is Initiated')
-      setElectionId(InitiatedElection.ElectionId)
+      setElectionId(initiatedElection.ElectionId)
       setElectionFound(true)
     }
   }else if( electionData == 0){
@@ -166,6 +166,7 @@ useEffect(() => {
         setIsActive(false);
         setElectionFound(false)
         Alert.alert("Success", "Election started successfully");
+        fetchElectionData();
       }
     } catch (error) {
       console.error(error);
@@ -181,7 +182,10 @@ useEffect(() => {
         { method: "POST" });
       if (response.ok) {
         const data = await response.json()
-        Alert.alert("Success", "Election Closed successfully" + data);
+        console.log(data)
+        Alert.alert("Success", `Election Closed successfully, \n${data.WinnerName} is the new ${data.Role} of this Council`) ;
+        setElectionFound(false)
+        setIsActive(false)
       }
     } catch (error) {
       console.error(error);
@@ -261,12 +265,12 @@ const renderItemforPanel = ({ item }) => (
           )}
         /> */}
       </View>
-    ):(
+    ): isActive? (
        <View style={styles.cont}>
          <Text style={styles.titleText}>Close the Election</Text>
          <View style={styles.card}>
       <Text style={styles.title}>{activeElectionData.electionName}</Text>
-      <Text style={styles.statusText}>Status: {activeElectionData.status}</Text>
+      <Text style={styles.statusText}>Status: {activeElectionData?.status || 'No Election Found'}</Text>
         </View>
       <FlatList
         data={votes}
@@ -279,27 +283,40 @@ const renderItemforPanel = ({ item }) => (
         )}
       />
     </View>
+        ) : (
+          <View style={styles.cont}>
+            <View style={{textAlign : 'center'}}>
+          <Text style={styles.titleText}>Elections</Text>
+          <Text style={{color : 'black', fontSize : 20}}>Nothing to Show Here!</Text>
+          <Text style={{color : 'black', fontSize : 20, marginBottom : 40}}>What can be the Reason?</Text>
+          <Text style={{color : 'black', fontSize : 17}}>  • No Election is Started.</Text>
+          <Text style={{color : 'black', fontSize : 17}}>  • No Nominations are Being Made.</Text>
+          <Text style={{color : 'black', fontSize : 17}}>  • An Election would have been Closed.</Text>
+          </View>
+          </View>
         )} 
 
     {/* Check if an election is active */}
     {isActive ? (
         <TouchableOpacity style={styles.closeButton} onPress={closeElection}>
           {loading?(
-            <ActivityIndicator size={'small'} color={'black'} />
+            <ActivityIndicator size={'small'} color={'white'} />
           ):(
           <Text style={styles.buttonText}>Close Election</Text>
           )}
           
         </TouchableOpacity>
-    ):(
+    ): isElectionFound ? (
       <TouchableOpacity style={styles.startButton} onPress={startElection}>
           {loading?(
             <ActivityIndicator size={'small'} color={'black'} />
           ):(
-          <Text style={styles.buttonText}>Start Election</Text>
+          <Text style={styles.buttonText2}>Start Election</Text>
           )}
         </TouchableOpacity>
-    ) }
+    ) : (
+      <Text></Text>
+    )}
 
       <View style={styles.footerContainer}>
         <Image
@@ -378,6 +395,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  buttonText2: {
+    color: '#000',
     fontWeight: 'bold',
     fontSize: 16,
   },

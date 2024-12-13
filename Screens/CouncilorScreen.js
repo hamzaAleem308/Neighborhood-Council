@@ -5,10 +5,10 @@ const screenWidth = Dimensions.get('window').width;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseURL from './Api'
 
-export default function ChairmanScreen ({ route, navigation }) {
+export default function CouncilorScreen ({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
   const {Council, councilName, councilDescription} = route.params;
-  
+   
   const [memberId, setMemberId] = useState(null);
   const [phoneNo, setPhoneNo] = useState(null);
   const [fullName, setFullName] = useState(null);

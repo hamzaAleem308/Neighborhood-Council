@@ -42,8 +42,11 @@ export default function CouncilCard({ route, council, navigation }) {
           case 'Member':
             navigation.navigate('ResidentScreen' , {Council : council.id, councilName : council.Name, councilDescription: council.Description});
             break;
+          case 'Councilor':
+            navigation.navigate('CouncilorScreen' , {Council : council.id, councilName : council.Name, councilDescription: council.Description});
+            break;
           case 'Chairperson':
-          navigation.navigate('ChairmanScreen' , {Council : council.id, councilName : council.Name, councilDescription: council.Description});
+            navigation.navigate('ChairmanScreen' , {Council : council.id, councilName : council.Name, councilDescription: council.Description});
           break;
           default:
             Alert.alert('Error', 'Unknown role.');
@@ -68,8 +71,15 @@ export default function CouncilCard({ route, council, navigation }) {
 
     <Card style={styles.card} onPress={checkUserType}>
       <Card.Content>
-        <Title style={{ color : 'black', fontWeight : '700'}}>{council.Name}</Title>
-        {/* <Paragraph style={{ color : 'black'}}>{council.Description}</Paragraph> */}
+        <Title style={{ color : 'black', fontWeight : '700', fontSize: 17}}>{council.Name}</Title>
+        <Paragraph 
+        style={{ color: 'black', fontSize: 12 }} 
+        numberOfLines={1}
+        ellipsizeMode="tail"
+          >
+        {council.Description}
+      </Paragraph>
+
       </Card.Content>
     </Card>
     <DividerLine/>

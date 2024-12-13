@@ -98,6 +98,12 @@ import ReportProblem from './ReportProblem/ReportProblem';
 import ViewElection from './Election/ViewElection';
 import ChairmanScreen from './ChairmanScreen';
 import SelectCategory from './ReportProblem/SelectCategory';
+import VotingScreen from './Election/VotingScreen';
+import SubmitReport from './ReportProblem/SubmitReport';
+import AddProject from './Project/AddProject';
+import Project from './Project/Project';
+import ManageMembers from './Admin/ManageMembers';
+import CouncilorScreen from './CouncilorScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -235,6 +241,12 @@ export default function App() {
       <Stack.Screen name="SelectCategory" component={SelectCategory} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
       <Stack.Screen name="Meeting" component={MeetingScreen} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
       <Stack.Screen name="ScheduleMeeting" component={ScheduleMeeting} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
+      <Stack.Screen name="VotingScreen" component={VotingScreen} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
+      <Stack.Screen name="SubmitReport" component={SubmitReport} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
+      <Stack.Screen name="AddProject" component={AddProject} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
+      <Stack.Screen name="Project" component={Project} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
+      <Stack.Screen name="ManageMembers" component={ManageMembers} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
+      <Stack.Screen name="CouncilorScreen" component={CouncilorScreen} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
       </Stack.Navigator>
     </NavigationContainer>
     </GestureHandlerRootView>

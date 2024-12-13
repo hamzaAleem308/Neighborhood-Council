@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     alignItems: 'flex-start',
-    marginTop: 20,
+    marginTop: 30,
     marginLeft: 5,
     marginBottom: 10,
   },
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
   },
   listContent: {
-    marginTop: 40,
+    marginTop: 50,
     paddingBottom: 80,
   },
   cardContainer: {

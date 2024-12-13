@@ -75,7 +75,7 @@ const getElectionAlongNominations = async () => {
  
 };
 
-  // Fetch election and votes data
+ 
 const fetchElectionData = async () => {
   try {
     console.log('Fetching Active data...');
@@ -83,14 +83,14 @@ const fetchElectionData = async () => {
     const data = await response.json();
 
     if (response.ok) {
-      // Set election data using data directly from the response
+   
       setActiveElectionData({
         electionId: data.ElectionId,
         electionName: data.ElectionName,
         status: data.Status,
       });
 
-      // Map through Candidates array and structure for UI display
+      
       if (data.Candidates && data.Candidates.length > 0) {
         const candidatesData = data.Candidates.map((candidate) => ({
           candidateId: candidate.CandidateId,
@@ -102,10 +102,8 @@ const fetchElectionData = async () => {
       } else {
         console.log('No candidates data found');
       }
-
-      // Set active status based on election status
-      setIsClosed(data.Status === "Close");
-      //setElectionFound(false)
+      setIsClosed(data.Status === "Closed");
+      
       console.log('Election data fetched successfully!');
     } else {
       console.log("Error: Failed to load election data");
@@ -116,8 +114,9 @@ const fetchElectionData = async () => {
 };
 
 useEffect(() => {
-  fetchElectionData()
-},[electionId])
+  getElectionAlongNominations();
+  fetchElectionData();
+},[electionId, councilID])
 
 useEffect(() => {
   if (activeElectionData.length > 0) {
@@ -140,7 +139,8 @@ useEffect(() => {
   return (
     <SafeAreaView style={styles.container}>
       <WavyBackground />
-      {isClosed?(<View style={styles.cont}>
+      {isClosed? (
+        <View style={styles.cont}>
          <Text style={styles.titleText}>Close the Election</Text>
          <View style={styles.card}>
       <Text style={styles.title}>{activeElectionData.electionName}</Text>
@@ -157,7 +157,9 @@ useEffect(() => {
         )}
       />
     </View>):( 
+      <View style={styles.cont}>
       <Text style={styles.titleText}>Election ongoing or No Election Started</Text>
+      </View>
       )} 
       <View style={styles.footerContainer}>
         
@@ -215,6 +217,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
 
+  },
+  titleText: {
+    fontSize: 20,
+    color: 'black',
+    textAlign: 'center'
   },
   voteText: {
     fontSize: 16,

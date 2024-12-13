@@ -81,12 +81,9 @@ export default function Login({}){
 
           await AsyncStorage.setItem('userToken', 'LoggedIn');
           console.log('Token saved');
-
-          Alert.alert(
-            'Welcome to the Portal',
-            `${userData.fullName}`,
-            [{ text: 'OK', onPress: () => navigation.replace('HomeScreen',{ memberID : userData.memberId}) }]
-          );
+          console.log(`Welcome to the Portal ${userData.fullName}`)
+          navigation.replace('HomeScreen',{ memberID : userData.memberId}) 
+          
         } else if(response.status === 401) {
           Alert.alert('Error', 'Incorrect Password');
         }

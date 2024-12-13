@@ -1,33 +1,81 @@
 import React, { useState } from 'react';
-import { Text, Image, SafeAreaView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Text, Image, SafeAreaView, StyleSheet, TouchableOpacity, useWindowDimensions, View, TextInput, Alert, ActivityIndicator } from 'react-native';
 import WavyBackground from '../../Background/WavyBackground';
 import DatePicker from 'react-native-date-picker';
+import { Dropdown } from 'react-native-element-dropdown';
+import  baseURL  from '../Api';
 
 export default function ScheduleMeeting ({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
-  const {memberId} = route.params;
+  const { memberId, councilId} = route.params;
   const [title, setTitle] = useState('')
   const [agenda, setAgenda] = useState('')
   const [location, setLocation] = useState('')
   const [meetingDate, setMeetingDate] = useState(new Date());
-  
+  const TypeList = [
+    { label: 'General', value: 'General' },
+    { label: 'Project', value: 'Project' },
+    { label: 'Hearing', value: 'Hearing' },
+  ];
+  const [type, setType] = useState('')
   const [startDatePickerOpen, setStartDatePickerOpen] = useState(false);
   const [mdData, setMdData] = useState('Select Meeting Date and Time')
-  
+  const [loading, setLoading] = useState(false)
+
+  const postMeeting = async() => {
+    let meeting = {
+      title : title,
+      description : agenda,
+      address : location,
+      council_id : councilId,
+      scheduled_date : meetingDate,
+      meeting_type : type
+    }
+    if(!title || !agenda || !location || !meetingDate || !type){
+      Alert.alert('Please Fill All Fields!')
+      return;
+    }
+    
+    try{
+      setLoading(true)
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      const response = await fetch(`${baseURL}meeting/postMeeting`, { 
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(meeting)}
+      )
+
+      if(response.ok){
+        console.log('Meeting Added')
+        Alert.alert('Meeting Scheduled Successfully!')
+        navigation.replace('Meeting', {councilId : councilId, memberId : memberId})
+      }
+      else{
+        console.log('Failed to Schedule Meeting.')
+      }
+    }
+    catch(error){
+      console.log('Unable to Schedule Meeting.')
+    }
+    setLoading(false)
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <WavyBackground />
-      <Text style={styles.header}>Council</Text>
+      <Text style={styles.header}>Schedule a Meeting</Text>
         <TextInput style={styles.input} placeholder="Enter Title" keyboardType="default" onChangeText={setTitle} placeholderTextColor="#000" />
         <TextInput style={styles.input} placeholder="Enter Agenda" keyboardType="default" onChangeText={setAgenda} placeholderTextColor="#000" />
-        <TextInput style={styles.input} placeholder="Meeting Location" keyboardType="default" onChangeText={setLocation} placeholderTextColor="#000" />
+        <View style={{flexDirection: 'row'}}>
         <TouchableOpacity style={styles.dobButton} onPress={() => setStartDatePickerOpen(true)}>
-            <Text style={styles.signUpButtonText}>{meetingDate}</Text>
+            <Text style={styles.signUpButtonText}>{mdData}</Text>
           </TouchableOpacity>
           <DatePicker
             modal
             open={startDatePickerOpen}
-            date={sd}
+            date={meetingDate}
             mode="datetime"
             onConfirm={(date) => {
               setStartDatePickerOpen(false);
@@ -36,8 +84,29 @@ export default function ScheduleMeeting ({ route, navigation }) {
             }}
             onCancel={() => setStartDatePickerOpen(false)}
           />
-        <TouchableOpacity style={styles.signInButton} onPress={{}}>
+           <Dropdown
+          data={TypeList}
+          style={styles.dropDown}
+          maxHeight={200}
+          labelField="label"
+          valueField="value"
+          placeholder="Select Type"
+          value={type}
+          onChange={(item) => {
+            setType(item.value);
+          }}
+          renderItem={(item) => <Text style={{ color: 'black' }}>{item.label}</Text>}
+          selectedTextStyle={{ color: 'black' }} // Ensures the selected text is black
+          placeholderStyle={{ color: 'black' }} // Ensures the placeholder text is black
+        />
+        </View>
+        <TextInput style={styles.input} placeholder="Meeting Location" keyboardType="default" onChangeText={setLocation} placeholderTextColor="#000" />
+        <TouchableOpacity style={styles.signInButton} onPress={postMeeting}>
+          {loading ?(
+            <ActivityIndicator size={'small'} color={'black'} />
+          ):(
             <Text style={styles.signInButtonText}>Schedule Meeting</Text>
+          )}
         </TouchableOpacity>
         <Image
           source={require('../../assets/Footer.png')}
@@ -66,6 +135,7 @@ const styles = StyleSheet.create({
     },
   header : {
       fontSize : 30,
+      bottom : 100,
       color : '#493D18',
       justifyContent : 'center',
       alignItems : 'center',
@@ -73,7 +143,7 @@ const styles = StyleSheet.create({
      },
   footer: {
     position: 'absolute',
-    bottom: 2,
+    bottom: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: useWindowDimensions,
@@ -84,7 +154,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignItems : 'center'
   },
+  dropDown :{
+    width: '40%',
+    padding: 15,
+    borderRadius: 25,
+    backgroundColor: '#F8F9FA',
+    marginBottom: 20,
+    placeholderTextColor : 'black',
+    //fontSize: 5
+  },
   signInButton: {
+    top: 40,
     width: '90%',
     padding: 15,
     borderRadius: 25,
@@ -109,7 +189,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   dobButton: {    
-    width: '65%',
+    width: '40%',
     padding: 15,
     borderRadius: 25,
     backgroundColor: '#F8F9FA',

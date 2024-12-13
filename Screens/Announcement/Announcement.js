@@ -40,24 +40,30 @@ export default function Announcement({navigation, route }) {
   // Function to fetch announcements data
   const fetchAnnouncements = async () => {
     try {
-      const response = await fetch(`${baseURL}announcement/getAnnouncements?memberId=${memberId}&councilId=${councilId}`);
-      const json = await response.json();
-
+      const response = await fetch(
+        `${baseURL}Announcement/getAnnouncementsForCouncil?councilId=${councilId}`
+      );
       if (response.ok) {
-        if (json && json.length > 0) {
-          const annData = json.map((ann) => ({
+        const data = await response.json(); 
+  
+        if (data && data.length > 0) {
+          
+          const annData = data.map((ann) => ({
             AnnouncementId: ann.AnnouncementId,
             Title: ann.Title,
             Description: ann.Description,
-            Date : ann.Date
+            Date: ann.Date,
+            MemberName: ann.AddedBy, 
+            RoleName: ann.RoleName, 
           }));
-          console.log('Announcements Loaded')
+  
           setAnnouncements(annData);
         } else {
           setAnnouncements([])
           console.log('No announcements Found');
         }
       } else {
+        setAnnouncements([])
         console.log("No Announcements found.");
       }
     } catch (error) {
@@ -70,24 +76,14 @@ export default function Announcement({navigation, route }) {
 
   const handleDeleteAnnouncement = async (memberId, councilId) => {
     try {
-      const response = await fetch(`${baseURL}Contact/deletecontact?id=${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        loadContacts();
-      } else {
-        Alert.alert('Error', 'Failed to delete contact');
-      }
     } catch (error) {
-      console.error('Error deleting contact:', error);
     }
   };
 
   useFocusEffect(
     useCallback(()=>{
       fetchAnnouncements()
-    } , [memberId, councilId])
+    } , [memberId, councilId, loading])
   )
 
   // useEffect(() => {
@@ -98,15 +94,11 @@ export default function Announcement({navigation, route }) {
     <View style={styles.card}>
       <Text style={styles.title}>{item.Title}</Text>
       <Text style={styles.description}>{item.Description}</Text>
-      <Text style={styles.date}>{new Date(item.Date).toDateString()}</Text>
-     
+      <Text style={styles.metaData}>
+                    ⁓ {item.MemberName} ({item.RoleName}) | Date: {new Date(item.Date).toDateString()}
+                  </Text>
     </View>
   );
-
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" style={{justifyContent: 'center'}} />;
-  }
-
 
 
   return (
@@ -116,18 +108,22 @@ export default function Announcement({navigation, route }) {
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Announcements</Text>
       </View>
-
-      <View style={styles.contentContainer}>
-        <FlatList
-          data={announcements}
-          keyExtractor={(item) => item.AnnouncementId.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={() => {
-            <Text style={{color: 'black'}}>No Announcement Found, Try Adding One from the Plus Icon.</Text>
-          }}
-        />
-      </View>
+    {loading ? (
+      <ActivityIndicator size="large" color="#0000ff" style={{justifyContent: 'center'}} />
+      ) : (
+    <View style={styles.contentContainer}>
+            <FlatList
+              data={announcements}
+              keyExtractor={(item) => item.AnnouncementId.toString()}
+              renderItem={renderItem}
+              contentContainerStyle={styles.listContent}
+              ListEmptyComponent={
+                <Text style={{color: 'black', textAlign : 'center', fontSize : 17}}>No Announcements Found!</Text>
+              }
+            />
+          </View>
+      )}
+      
       <FAB
             style={styles.fab}
             color = {'black'}
@@ -157,7 +153,7 @@ const styles = StyleSheet.create({
     fontFamily: 'KronaOne-Regular',
     fontSize: 20,
     color: '#000',
-    marginBottom: 55,
+    marginBottom: 30,
   },
   heading: {
     fontSize: 24,
@@ -168,6 +164,11 @@ const styles = StyleSheet.create({
   listContainer: {
     alignItems : 'center',
     paddingBottom: 20,
+  },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 0,
+    paddingBottom: 80,
   },
   card: {
     backgroundColor: '#fff',
@@ -191,12 +192,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 5,
+    marginBottom : 10,
   },
-  date: {
+  metaData: {
     fontSize: 12,
     color: '#888',
-    marginTop: 8,
-    textAlign: 'right',
   },
   fab: {
     position: 'absolute',

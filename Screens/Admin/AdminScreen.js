@@ -135,10 +135,10 @@ return (
   <TouchableOpacity style={styles.signInButton} onPress={{}}>
     <Text style={styles.signInButtonText}>Edit Community Info</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.signInButton}>
+  <TouchableOpacity style={styles.signInButton} onPress={() => navigation.navigate('ManageMembers', { councilId: Council })}>
     <Text style={styles.signInButtonText}>Manage Members</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.signInButton}>
+  <TouchableOpacity style={styles.signInButton} onPress={() => {navigation.navigate('Meeting', {councilId : Council, memberId : memberId})}}>
     <Text style={styles.signInButtonText}>Meetings</Text>
   </TouchableOpacity>
   <TouchableOpacity style={styles.signInButton}>
