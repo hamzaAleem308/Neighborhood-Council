@@ -13,8 +13,8 @@ export default function AdministrateElection ({ navigation, route }) {
      <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Create Election', {councilID: councilId})}}>
           <Text style={styles.signInButtonText}>Create New Election</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Nominate Candidate' , {councilID: councilId})}}>
-            <Text style={styles.signInButtonText}>Nominate Candidates</Text>
+        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('ViewNomination' , {councilId: councilId})}}>
+            <Text style={styles.signInButtonText}>View Nomination</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('View Election' , {councilID: councilId})}}>
             <Text style={styles.signInButtonText}>View Election</Text>
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   titleText: {
-    bottom : 100,
+    bottom : 150,
     color: 'black',
     margin: 10,
     fontSize: 30,

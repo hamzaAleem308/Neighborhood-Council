@@ -78,7 +78,7 @@ const handlePress = () =>{
     <SafeAreaView style={styles.container}>
       <WavyBackground />
       {/* Complaints Diary Title */}
-      <Text style={[styles.header, {top: 100} ]}>Report your Problem!</Text>
+      <Text style={styles.titleText}>Report your Problem!</Text>
       <View style={{marginTop:200}}>
       <Text style={styles.header}>COMPLAINTS DIARY</Text>
       {/* Total Complaints */}
@@ -192,6 +192,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
     color: 'black',
+  },
+  titleText: {
+    color: 'black',
+    top : 100,
+    marginBottom: 30,
+    fontSize: 30,
+    textAlign: 'center',
   },
   statsContainer: {
     alignItems: 'center',

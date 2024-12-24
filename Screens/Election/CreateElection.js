@@ -234,10 +234,15 @@ export default function CreateElection({ navigation, route }) {
 
       if (response.ok) {
         Alert.alert('Success!', 'Election Added Successfully, Now select Candidates for Election!', 
-            [{ text: 'OK', onPress: () => navigation.replace('Nominate Candidate', {councilID: councilID})}]);
+            [{ text: 'OK', onPress: () => navigation.goBack()}]);
         console.log('Election Added Successfully');
+      } else if(response.status == 302){
+        Alert.alert('Error', 'Election Already Exists, Close the previous one First');
+        navigation.goBack();
+        console.log('Response Status:', response.status); 
+        console.log('Response Body:', await response.text());
       } else {
-        Alert.alert('Error', 'Failed to create election');
+        console.log('Error Creating Election');
         console.log('Response Status:', response.status); 
         console.log('Response Body:', await response.text());
       }
@@ -254,20 +259,20 @@ export default function CreateElection({ navigation, route }) {
       return;
     }
     
-    if(!sd || !ed){
-      Alert.alert('Please select Election Dates!')
-      return;
-    }
+  //   if(!sd || !ed){
+  //     Alert.alert('Please select Election Dates!')
+  //     return;
+  //   }
 
-    if (sd < currentDate) {
-    Alert.alert('Invalid Start Date', 'The start date cannot be in the past.');
-    return;
-    }
+  //   if (sd < currentDate) {
+  //   Alert.alert('Invalid Start Date', 'The start date cannot be in the past.');
+  //   return;
+  //   }
 
-   if (ed <= sd) {
-    Alert.alert('Invalid End Date', 'The end date must be after the start date.');
-    return;
-    }   
+  //  if (ed <= sd) {
+  //   Alert.alert('Invalid End Date', 'The end date must be after the start date.');
+  //   return;
+  //   }   
     Alert.alert(
       'Are you sure?',
       'Do you want to start an Election?',
@@ -305,11 +310,11 @@ export default function CreateElection({ navigation, route }) {
             modal
             open={startDatePickerOpen}
             date={sd}
-            mode="datetime"
+            mode="date"
             onConfirm={(date) => {
               setStartDatePickerOpen(false);
               setSd(date);
-              setSdData(date.toLocaleString());
+              setSdData(date.toDateString());
             }}
             onCancel={() => setStartDatePickerOpen(false)}
           />
@@ -321,11 +326,11 @@ export default function CreateElection({ navigation, route }) {
             modal
             open={endDatePickerOpen}
             date={ed}
-            mode="datetime"
+            mode="date"
             onConfirm={(date) => {
               setEndDatePickerOpen(false);
               setEd(date);
-              setEdData(date.toLocaleString());
+              setEdData(date.toDateString());
             }}
             onCancel={() => setEndDatePickerOpen(false)}
           />

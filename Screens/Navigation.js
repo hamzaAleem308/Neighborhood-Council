@@ -104,6 +104,9 @@ import AddProject from './Project/AddProject';
 import Project from './Project/Project';
 import ManageMembers from './Admin/ManageMembers';
 import CouncilorScreen from './CouncilorScreen';
+import ViewNominations from './Election/ViewNominations';
+import NominatePanel from './Election/NominatePanel';
+import ViewIssues from './ReportProblem/ViewIssues';
 
 const Drawer = createDrawerNavigator();
 
@@ -247,6 +250,10 @@ export default function App() {
       <Stack.Screen name="Project" component={Project} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
       <Stack.Screen name="ManageMembers" component={ManageMembers} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>    
       <Stack.Screen name="CouncilorScreen" component={CouncilorScreen} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="NominatePanel" component={NominatePanel} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="ViewNomination" component={ViewNominations} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="ViewIssues" component={ViewIssues} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      
       </Stack.Navigator>
     </NavigationContainer>
     </GestureHandlerRootView>

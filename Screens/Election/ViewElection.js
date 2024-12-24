@@ -19,6 +19,49 @@ export default function ViewElection ({ route , navigation}) {
   const [votes, setVotes] = useState([])
   const [panelData, setPanelData] = useState([])
   const [membersData, setMembersData] = useState([])
+  const [eDate, setEDate] = useState(new Date())
+  const [sDate, setSDate] = useState(new Date())
+  const [intervalTime, setIntervalTime] = useState(15000);
+  const [electionStatus, setElectionStatus] = useState('')
+
+  useEffect(() => {
+    if (electionData.length > 0) {
+      const activeElection = electionData.find((ele) => ele.Status === "Active");
+      if (activeElection) {
+        setElectionId(activeElection.ElectionId);
+        setIsActive(true);
+        fetchElectionData();
+        console.log('Election is Active')
+      } 
+      const initiatedElection = electionData.find((ele) => ele.Status === 'Initiated')
+      if(initiatedElection){
+        console.log('Election is Initiated')
+        setElectionId(initiatedElection.ElectionId)
+        setElectionFound(true)
+      }
+    }else if( electionData == 0){
+      console.log('No Election Found')
+      setElectionFound(false)
+      setIsActive(false)
+    }
+  }, [electionData, electionId, isActive]); // Runs only when `electionData` changes
+
+  useEffect(() => {
+    // Transform electionData to extract all panels
+    const panels = electionData.flatMap((election) => election.Panels);
+    setPanelData(panels);
+  }, [electionData]);
+  
+ 
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      triggerElection();
+    }, intervalTime);
+  
+    return () => clearInterval(interval);
+  }, [intervalTime, sDate, eDate, councilID, electionId, electionStatus]); // Re-run the effect if `intervalTime` changes
+  
 
 //Retreiving elections data with nominations to start the elections
 const getElectionAlongNominations = async () => {
@@ -28,49 +71,68 @@ const getElectionAlongNominations = async () => {
     });
 
     if (response.ok) {
-      console.log('Loading Elections Data');
-      const data = await response.json(); 
-      //setElectionFound(true)
+      console.log('Loading Elections Data...');
+      const data = await response.json();
+
       if (data && data.length > 0) {
+        // Extract unique election data
         const uniqueElections = data.filter((value, index, self) =>
           index === self.findIndex((e) => e.ElectionId === value.ElectionId)
         );
 
+        // Map elections with their panels and members
         const electionData = uniqueElections.map((ele) => ({
           ElectionId: ele.ElectionId,
           ElectionName: ele.ElectionName,
-          ElectionStatus: ele.Status,
+          Status: ele.Status,
+          StartDate: ele.StartDate,
+          EndDate: ele.EndDate,
+          Panels: data
+            .filter((panel) => panel.ElectionId === ele.ElectionId) // Filter panels for this election
+            .map((panel) => ({
+              PanelId: panel.PanelId,
+              PanelName: panel.PanelName,
+              CandidateId: panel.CandidateId,
+              CandidateName: panel.MemberName,
+              PanelMembers: panel.PanelMembers.map((pm) => ({
+                MemberId: pm.MemberId,
+                MemberName: pm.MemberName,
+              })),
+            })),
         }));
+        if (electionData.length > 0) {
+          const firstElection = electionData[0];
+          const formattedStartDate = formatDate(firstElection.StartDate);
+          const formattedEndDate = formatDate(firstElection.EndDate);
         
+          setSDate(formattedStartDate);
+          setEDate(formattedEndDate);
+        
+          console.log('Formatted Start Date:', formattedStartDate);
+          console.log('Formatted End Date:', formattedEndDate);
+        }
+        if (electionData.length > 0) {
+          const firstElection = electionData[0];
+          setElectionStatus(firstElection.Status)
+        }
+        // const electionStartDate = uniqueElections.map((ele) => ({
+        //   StartDate: ele.StartDate,
+        // }));
+        // setSDate(electionStartDate)
+
+        // const electionEndDate = uniqueElections.map((ele) => ({
+        //   EndDate: ele.EndDate,
+        // }));
+        // setEDate(electionEndDate)
         setElectionData(electionData);
-
-        // const panelData = data.map((panel) => ({
-        //   PanelId: panel.PanelId,
-        //   PanelName: panel.PanelName,
-        // }));
-        // setPanelData(panelData);
-
-        // const memberData = data.map((mem) => ({
-        //   MemberId: mem.MemberId,
-        //   MemberName: mem.MemberName,
-        // }));
-        // setMembersData(memberData);
-
-        const panelData = data.map((panel) => ({
-          PanelId: panel.PanelId,
-          PanelName: panel.PanelName,
-          MemberId: panel.MemberId,
-          MemberName: panel.MemberName,
-        }));
-        setPanelData(panelData);
-
-        console.log('Elections Data Loaded!');
+        setElectionFound(false);
+        console.log('Elections Data Loaded Successfully:', electionData);
       } else {
-        setElectionFound(false)
-        Alert.alert('No data found');
+        setElectionFound(false);
+        Alert.alert('No data found for this council');
       }
     } else {
-      setElectionFound(false)
+      setElectionFound(false);
       Alert.alert('Failed to retrieve data');
       console.error('Response not OK:', response.status, response.statusText);
     }
@@ -78,14 +140,56 @@ const getElectionAlongNominations = async () => {
     console.error('Error fetching data:', error);
     Alert.alert('Error fetching data');
   }
- 
 };
+
+// const formatDate = (dateString) => {
+//   const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+//   return new Date(dateString).toISOString(undefined, options);
+// };
+const formatDate = (dateString) => {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+  });
+  return formatter.format(new Date(dateString));
+};
+
+
+const triggerElection = () => {
+  const currentDate = new Date().toISOString();
+  const startDate = sDate;
+  const endDate = eDate;
+  const now = formatDate(currentDate);
+  console.log("Start Date:", startDate);
+  console.log("Current Date:", now);
+  console.log("End Date:", endDate);
+  console.log('Election Status: ' + electionStatus)
+  
+  // Check if the election should start
+  if (now >= startDate && now < endDate) {
+    if(electionStatus !== 'Active'){
+    startElection();
+    console.log("Election has started!");
+  }
+} 
+  // Check if the election should end
+  else if (now >= endDate) {
+    closeElection();
+    console.log("Election has ended!");
+  } 
+  // If neither condition is met
+  else {
+    console.log("Election not active.");
+    return;
+  }
+  };
 
 // Fetch election and votes data
 const fetchElectionData = async () => {
   try {
     console.log('Fetching Active data...');
-    const response = await fetch(`${baseURL}election/GetElectionWithVotes?electionId=${electionId}`);
+    const response = await fetch(`${baseURL}election/GetElectionWithVotes?councilId=${councilID}`);
     const data = await response.json();
 
     if (response.ok) {
@@ -94,6 +198,8 @@ const fetchElectionData = async () => {
         electionId: data.ElectionId,
         electionName: data.ElectionName,
         status: data.Status,
+        startDate: data.StartDate,
+        endDate: data.EndDate
       });
 
       // Map through Candidates array and structure for UI display
@@ -103,6 +209,8 @@ const fetchElectionData = async () => {
           candidateName: candidate.CandidateName,
           voteCount: candidate.VoteCount,
         }));
+        setIsActive(data.Status == 'Active')
+        console.log('Election Status: ' + data.Status)
         setVotes(candidatesData);
         console.log('Candidates data set successfully');
       } else {
@@ -111,6 +219,7 @@ const fetchElectionData = async () => {
 
       // Set active status based on election status
       setIsActive(data.Status === "Active");
+      setElectionFound(false)
       //setElectionFound(false)
       console.log('Election data fetched successfully!');
     } else {
@@ -126,35 +235,6 @@ useEffect(() => {
 }, [councilID])
 
 
-// useEffect(() => {
-//   fetchElectionData()
-// }, [electionId]);
-
-
-
-useEffect(() => {
-  if (electionData.length > 0) {
-    const activeElection = electionData.find((ele) => ele.ElectionStatus === "Active");
-    if (activeElection) {
-      setElectionId(activeElection.ElectionId);
-      setIsActive(true);
-      fetchElectionData()
-      console.log('Election is Active')
-    } 
-    const initiatedElection = electionData.find((ele) => ele.ElectionStatus === 'Initiated')
-    if(initiatedElection){
-      console.log('Election is Initiated')
-      setElectionId(initiatedElection.ElectionId)
-      setElectionFound(true)
-    }
-  }else if( electionData == 0){
-    console.log('No Election Found')
-    setElectionFound(false)
-    setIsActive(false)
-  }
-}, [electionData, electionId]); // Runs only when `electionData` changes
-
-
 // Start election
   const startElection = async () => {
     try {
@@ -163,9 +243,10 @@ useEffect(() => {
       const response = await fetch(`${baseURL}election/StartElection?electionId=${electionId}`, 
         { method: "POST" });
       if (response.ok) {
-        setIsActive(false);
+        
         setElectionFound(false)
         Alert.alert("Success", "Election started successfully");
+        setElectionStatus('Active')
         fetchElectionData();
       }
     } catch (error) {
@@ -203,21 +284,36 @@ const formatTime = (milliseconds) => {
 const renderItemForElection = ({ item }) => (
   <View style={styles.card}>
     <Text style={styles.electionName}>{item.ElectionName}</Text>
-    <Text style={styles.electionStatus}>{item.ElectionStatus}</Text>
+    <Text style={styles.electionStatus}>{item.Status}</Text>
   </View>
 );
 
 
-const renderItemforPanel = ({ item }) => (
+const renderItemForPanel = ({ item }) => (
   <View style={styles.card}>
-    <View style={styles.panelContainer}>
-      <Text style={styles.panelLabel}>Panel:</Text>
-      <Text style={styles.panelName}>{item.PanelName || 'No Panel Assigned'}</Text>
-      <Text style={styles.memberLabel}>,   Candidate:</Text>
-      <Text style={styles.memberName}>{item.MemberName || 'No Member Assigned'}</Text>
+  <View style={styles.panelContainer}>
+    <Text style={styles.panelText}>Panel Name: {item.PanelName}</Text>
+    <Text style={styles.panelText}>Candidate Name: {item.CandidateName}</Text>
+    {item.PanelMembers.map((member) => (
+      <Text key={member.MemberId} style={styles.memberText}>
+        Member: {member.MemberName}
+      </Text>
+    ))}
     </View>
   </View>
 );
+
+
+// const renderItemforPanel = ({ item }) => (
+//   <View style={styles.card}>
+//     <View style={styles.panelContainer}>
+//       <Text style={styles.panelLabel}>Panel:</Te xt>
+//       <Text style={styles.panelName}>{item.PanelName || 'No Panel Assigned'}</Text>
+//       <Text style={styles.memberLabel}>,   Candidate:</Text>
+//       <Text style={styles.memberName}>{item.MemberName || 'No Member Assigned'}</Text>
+//     </View>
+//   </View>
+// );
 
 // const renderItemForMembers = ({ item }) => (
 //   <TouchableOpacity style={styles.card}>
@@ -246,14 +342,14 @@ const renderItemforPanel = ({ item }) => (
           )}
         />
           <FlatList
-          data={panelData}
-          renderItem={renderItemforPanel}
-          keyExtractor={(item) => item.PanelId.toString()}
-          contentContainerStyle={styles.cont2}
-          ListEmptyComponent={() => (
-            <Text style={{ color: 'black' }}>No Panel Found</Text>
-          )}
-        />
+      data={panelData}
+      renderItem={renderItemForPanel}
+      keyExtractor={(item) => item.PanelId.toString()}
+      contentContainerStyle={styles.cont3}
+      ListEmptyComponent={() => (
+        <Text style={{ color: 'black' }}>No Panel Found</Text>
+      )}
+    />
         {/* Uncomment if members data is needed */}
         {/* <FlatList
           data={membersData}
@@ -268,7 +364,7 @@ const renderItemforPanel = ({ item }) => (
     ): isActive? (
        <View style={styles.cont}>
          <Text style={styles.titleText}>Close the Election</Text>
-         <View style={styles.card}>
+         <View style={styles.card1}>
       <Text style={styles.title}>{activeElectionData.electionName}</Text>
       <Text style={styles.statusText}>Status: {activeElectionData?.status || 'No Election Found'}</Text>
         </View>
@@ -302,7 +398,7 @@ const renderItemforPanel = ({ item }) => (
           {loading?(
             <ActivityIndicator size={'small'} color={'white'} />
           ):(
-          <Text style={styles.buttonText}>Close Election</Text>
+          <Text style={styles.buttonText}>Election Closes At {`\n`}{eDate}</Text>
           )}
           
         </TouchableOpacity>
@@ -311,7 +407,7 @@ const renderItemforPanel = ({ item }) => (
           {loading?(
             <ActivityIndicator size={'small'} color={'black'} />
           ):(
-          <Text style={styles.buttonText2}>Start Election</Text>
+          <Text style={styles.buttonText2}>Election Starts At {`\n`}{sDate}</Text>
           )}
         </TouchableOpacity>
     ) : (
@@ -340,7 +436,7 @@ const styles = StyleSheet.create({
   titleText: {
     color: 'black',
     top : 50,
-    marginBottom: 90,
+    marginBottom: 80,
     fontSize: 30,
     textAlign: 'center',
   },
@@ -348,7 +444,7 @@ const styles = StyleSheet.create({
     flex : 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom : 50
+    marginBottom : 10
   },
   cont2: {
     flex : 1,
@@ -356,6 +452,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom : 10
   },
+
   signInButton: {
     width: '80%',
     padding: 15,
@@ -403,7 +500,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  card: {
+ 
+  card1: {
     width: '85%',
     backgroundColor: '#fff',
     padding: 16,
@@ -444,6 +542,44 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
     marginLeft: 8,
+  },
+  cont3: {
+    marginTop: 50,
+    paddingBottom: 80,
+  },
+  card: {
+    backgroundColor: '#FFFFFF', // White background for the card
+    borderRadius: 12, // Rounded corners
+    padding: 15, // Inner spacing
+    marginVertical: 10, // Space between cards
+    marginHorizontal: 10, // Space on the sides
+    shadowColor: '#000', // Shadow color
+    shadowOffset: { width: 0, height: 2 }, // Shadow position
+    shadowOpacity: 0.1, // Shadow transparency
+    shadowRadius: 4, // Shadow blur
+    elevation: 3, // Shadow for Android
+    bottom : 20
+    
+  },
+  panelContainer: {
+    borderColor: '#E0E0E0', // Light border
+    borderWidth: 1, // Border thickness
+    borderRadius: 10, // Rounded corners
+    padding: 10, // Inner spacing
+    backgroundColor: '#F9F9F9', // Light gray background for the panel
+  },
+  panelText: {
+    fontSize: 16, // Slightly larger text
+    fontWeight: '600', // Semi-bold for emphasis
+    color: '#333', // Darker text for contrast
+    marginBottom: 8, // Space below each line
+  },
+  memberText: {
+    fontSize: 14, // Standard font size
+    fontWeight: '400', // Regular font weight
+    color: '#555', // Medium gray for member names
+    marginLeft: 10, // Indent member names
+    marginTop: 4, // Space above each member name
   },
   memberContainer: {
     flexDirection: 'row',

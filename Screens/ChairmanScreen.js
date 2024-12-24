@@ -206,7 +206,7 @@ export default function ChairmanScreen ({ route, navigation }) {
         <Image source={require('../assets/projects.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Projects</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button}  onPress={() => {navigation.navigate('ViewIssues', {councilId : Council, memberId : memberId})}}>
         <Image source={require('../assets/ViewIssues.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>View Problems</Text>
       </TouchableOpacity>

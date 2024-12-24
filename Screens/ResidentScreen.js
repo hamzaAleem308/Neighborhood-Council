@@ -28,6 +28,12 @@ export default function ResidentScreen ({ route, navigation }) {
 
   const openMenu2 = () => setMenuVisible2(true);
   const closeMenu2 = () => setMenuVisible2(false);
+
+  const [menuVisibleForNomination, setMenuVisibleForNominations] = useState(false);
+
+  const openMenu3 = () => setMenuVisibleForNominations(true);
+  const closeMenu3 = () => setMenuVisibleForNominations(false);
+
   useEffect(() => {
     const fetchUserData = async () => {
       const userData = await getUserData();
@@ -106,6 +112,16 @@ export default function ResidentScreen ({ route, navigation }) {
       console.error(error);
     }
   };
+
+  const handleNominationScreen = () => {
+    navigation.navigate('NominatePanel', { councilId: Council })
+    closeMenu3()
+  }
+  
+  const handleNominationViewScreen = () => {
+    navigation.navigate('ViewNomination', { councilId: Council })
+    closeMenu3()
+  }
 
   useEffect(() => {
     fetchElection()
@@ -242,6 +258,62 @@ export default function ResidentScreen ({ route, navigation }) {
         <Image source={require('../assets/projects.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Projects</Text>
       </TouchableOpacity>
+
+
+     {/* Menu Modal for Nominations*/}
+    
+      <TouchableOpacity 
+        style={styles.button} 
+        onPress={openMenu3}
+      >
+        <Image source={require('../assets/nominate.png')} style={styles.buttonIcon} />
+        <Text style={styles.buttonText}>Nominate Panel</Text>
+      </TouchableOpacity>
+
+      <Modal
+  visible={menuVisibleForNomination}
+  transparent={true}
+  animationType="fade"
+  onRequestClose={closeMenu3}
+>
+  <View style={styles.modalOverlay} >
+    <View style={styles.menuContainer}>
+      {/* Modal Header with Close Button */}
+      <View style={styles.headerContainer2}>
+        <Text style={styles.headerText}>Setup Nomination</Text>
+        <TouchableOpacity onPress={closeMenu3} style={styles.closeButton}>
+          <Text style={styles.closeButtonText}>X</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Modal Content */}
+      <View style={styles.modalContent}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleNominationScreen}
+        >
+          <Image
+            source={require('../assets/setNomination.png')}
+            style={styles.buttonIcon}
+          />
+          <Text style={styles.buttonText}>Nominate Panel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleNominationViewScreen}
+        >
+          <Image
+            source={require('../assets/viewNomination.png')}
+            style={styles.buttonIcon}
+          />
+          <Text style={styles.buttonText}>View All Nominations</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
+
     </View>
 
     <Image
