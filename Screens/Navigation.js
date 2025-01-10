@@ -107,6 +107,12 @@ import CouncilorScreen from './CouncilorScreen';
 import ViewNominations from './Election/ViewNominations';
 import NominatePanel from './Election/NominatePanel';
 import ViewIssues from './ReportProblem/ViewIssues';
+import ManageProjects from './Project/ManageProjects';
+import ProjectDetails from './Project/ProjectsDetails';
+import ProjectLogs from './Project/ProjectLogs';
+import EditCouncilInfo from './Admin/EditCouncilInfo';
+import ViewReportedProblems from './ReportProblem/ViewReportedProblem';
+import ViewProblemProgress from './ReportProblem/ViewProblemProgress';
 
 const Drawer = createDrawerNavigator();
 
@@ -253,7 +259,12 @@ export default function App() {
       <Stack.Screen name="NominatePanel" component={NominatePanel} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
       <Stack.Screen name="ViewNomination" component={ViewNominations} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
       <Stack.Screen name="ViewIssues" component={ViewIssues} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
-      
+      <Stack.Screen name="ManageProjects" component={ManageProjects} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="ProjectDetails" component={ProjectDetails} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="ProjectLogs" component={ProjectLogs} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="EditCouncilInfo" component={EditCouncilInfo} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="ViewReportedProblems" component={ViewReportedProblems} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="ViewProblemProgress" component={ViewProblemProgress} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
       </Stack.Navigator>
     </NavigationContainer>
     </GestureHandlerRootView>

@@ -132,7 +132,7 @@ return (
   <Text style={styles.desc}>Description: {councilData?.Description || 'Loading...'}</Text>
   <DividerLine />
 
-  <TouchableOpacity style={styles.signInButton} onPress={{}}>
+  <TouchableOpacity style={styles.signInButton} onPress={() => navigation.navigate('EditCouncilInfo', { councilId: Council })}>
     <Text style={styles.signInButtonText}>Edit Community Info</Text>
   </TouchableOpacity>
   <TouchableOpacity style={styles.signInButton} onPress={() => navigation.navigate('ManageMembers', { councilId: Council })}>
@@ -141,7 +141,7 @@ return (
   <TouchableOpacity style={styles.signInButton} onPress={() => {navigation.navigate('Meeting', {councilId : Council, memberId : memberId})}}>
     <Text style={styles.signInButtonText}>Meetings</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.signInButton}>
+  <TouchableOpacity style={styles.signInButton} onPress={() => {navigation.navigate('ViewIssues', {councilId : Council, memberId : memberId})}}>
     <Text style={styles.signInButtonText}>Complaints</Text>
   </TouchableOpacity>
 

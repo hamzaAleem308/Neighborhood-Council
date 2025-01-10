@@ -238,9 +238,11 @@ export default function VotingScreen({ route, navigation }) {
 
       if (response.ok) {
         Alert.alert('Success', 'Your vote has been cast successfully.');
+        navigation.goBack();
       } else {
         const errorData = await response.json();
         Alert.alert('Error', errorData);
+        navigation.goBack();
       }
     } catch (error) {
       Alert.alert('Error', 'An error occurred while casting your vote.');

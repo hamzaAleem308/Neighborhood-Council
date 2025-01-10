@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import WavyBackground from '../../Background/WavyBackground';
 import WavyBackground2 from '../../Background/WavyBackground2';
 import  baseURL  from '../Api';
 import DividerLine from '../../Background/LineDivider';
+import { BarChart } from 'react-native-chart-kit';
 
 export default function ViewElection ({ route , navigation}) {
   const { width } = useWindowDimensions(); // screen width
@@ -49,7 +50,7 @@ export default function ViewElection ({ route , navigation}) {
   useEffect(() => {
     // Transform electionData to extract all panels
     const panels = electionData.flatMap((election) => election.Panels);
-    setPanelData(panels);
+    setPanelData(panels); 
   }, [electionData]);
   
  
@@ -60,7 +61,7 @@ export default function ViewElection ({ route , navigation}) {
     }, intervalTime);
   
     return () => clearInterval(interval);
-  }, [intervalTime, sDate, eDate, councilID, electionId, electionStatus]); // Re-run the effect if `intervalTime` changes
+  }, [intervalTime, sDate, eDate, councilID, electionId, electionStatus]); // Re-run the effect if `intervalTime` changes 
   
 
 //Retreiving elections data with nominations to start the elections
@@ -97,6 +98,7 @@ const getElectionAlongNominations = async () => {
               PanelMembers: panel.PanelMembers.map((pm) => ({
                 MemberId: pm.MemberId,
                 MemberName: pm.MemberName,
+                MemberRole: pm.MemberRole
               })),
             })),
         }));
@@ -175,7 +177,7 @@ const triggerElection = () => {
 } 
   // Check if the election should end
   else if (now >= endDate) {
-    closeElection();
+    closeElection(electionId, councilID);
     console.log("Election has ended!");
   } 
   // If neither condition is met
@@ -255,18 +257,22 @@ useEffect(() => {
     setLoading(false)
   };
 
-  const closeElection = async() => {
+  const closeElection = async(electionId, councilID) => {
     try {
       setLoading(true)
       await new Promise(resolve => setTimeout(resolve, 2000))
       const response = await fetch(`${baseURL}election/closeElection?electionId=${electionId}&councilId=${councilID}`, 
         { method: "POST" });
+      //const json = await response.json();
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
         console.log(data)
         Alert.alert("Success", `Election Closed successfully, \n${data.WinnerName} is the new ${data.Role} of this Council`) ;
         setElectionFound(false)
         setIsActive(false)
+      }
+      else{
+        console.log(data)
       }
     } catch (error) {
       console.error(error);
@@ -296,7 +302,7 @@ const renderItemForPanel = ({ item }) => (
     <Text style={styles.panelText}>Candidate Name: {item.CandidateName}</Text>
     {item.PanelMembers.map((member) => (
       <Text key={member.MemberId} style={styles.memberText}>
-        Member: {member.MemberName}
+        Member: {member.MemberName} ⁓{member.MemberRole}
       </Text>
     ))}
     </View>
@@ -323,6 +329,15 @@ const renderItemForPanel = ({ item }) => (
 //     </View>
 //   </TouchableOpacity>
 // );
+// Transform data for Bar Chart
+const chartData = {
+  labels: votes.map((item) => item.candidateName), // Candidate names as x-axis labels
+  datasets: [
+    {
+      data: votes.map((item) => item.voteCount), // Vote counts as bar heights
+    },
+  ],
+};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -368,6 +383,27 @@ const renderItemForPanel = ({ item }) => (
       <Text style={styles.title}>{activeElectionData.electionName}</Text>
       <Text style={styles.statusText}>Status: {activeElectionData?.status || 'No Election Found'}</Text>
         </View>
+
+         {/* Bar Chart */}
+      <BarChart
+        data={chartData}
+        width={Dimensions.get('window').width - 32} // Adjust width to fit screen
+        height={220}
+        yAxisLabel=""
+        yAxisSuffix=" votes"
+        chartConfig={{
+          backgroundColor: '#ffffff',
+          backgroundGradientFrom: '#f0f4f7',
+          backgroundGradientTo: '#f0f4f7',
+          decimalPlaces: 0, // No decimal places
+          color: (opacity = 1) => `rgba(34, 94, 203, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          style: {
+            borderRadius: 8,
+          },
+        }}
+        style={styles.chart}
+      />
       <FlatList
         data={votes}
         keyExtractor={(item) => item.candidateId.toString()}
@@ -394,7 +430,7 @@ const renderItemForPanel = ({ item }) => (
 
     {/* Check if an election is active */}
     {isActive ? (
-        <TouchableOpacity style={styles.closeButton} onPress={closeElection}>
+        <TouchableOpacity style={styles.closeButton} onPress={() => closeElection(electionId, councilID)}>
           {loading?(
             <ActivityIndicator size={'small'} color={'white'} />
           ):(
@@ -629,6 +665,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
 
+  },
+  chart: {
+    marginBottom: 24,
+    borderRadius: 8,
+    alignSelf: 'center',
   },
   voteText: {
     fontSize: 16,

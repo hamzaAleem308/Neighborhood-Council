@@ -3,6 +3,7 @@ import { Alert, Dimensions, FlatList, Image, Modal, SafeAreaView, StyleSheet, Te
 import WavyBackground from '../Background/WavyBackground';
 const screenWidth = Dimensions.get('window').width;
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DividerLine from '../Background/LineDivider';
 
 export default function ResidentScreen ({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
@@ -34,6 +35,16 @@ export default function ResidentScreen ({ route, navigation }) {
   const openMenu3 = () => setMenuVisibleForNominations(true);
   const closeMenu3 = () => setMenuVisibleForNominations(false);
 
+  const [menuVisible4, setMenuVisible4] = useState(false);
+
+  const openMenu4 = () => setMenuVisible4(true);
+  const closeMenu4 = () => setMenuVisible4(false);
+
+  const [menuVisibleForReportProblem, setMenuVisibleForReportProblem] = useState(false);
+
+  const openMenu5 = () => setMenuVisibleForReportProblem(true);
+  const closeMenu5 = () => setMenuVisibleForReportProblem(false);
+
   useEffect(() => {
     const fetchUserData = async () => {
       const userData = await getUserData();
@@ -63,7 +74,8 @@ export default function ResidentScreen ({ route, navigation }) {
     }
   };
 
-  
+  const [announcementFound, setAnnouncementFound] = useState(false);
+
   const getAnnouncementsForResidents = async () => {
     try {
       const response = await fetch(
@@ -82,6 +94,7 @@ export default function ResidentScreen ({ route, navigation }) {
             MemberName: ann.AddedBy, 
             RoleName: ann.RoleName, 
           }));
+          setAnnouncementFound(data.length > 0)
           setAnnouncementsData(annData);
           console.log("Announcements Loaded", annData);
         } else {
@@ -123,11 +136,60 @@ export default function ResidentScreen ({ route, navigation }) {
     closeMenu3()
   }
 
+  const handleReportProblemScreen = () => {
+    navigation.navigate('ReportProblem', { councilId: Council })
+    closeMenu5()
+  }
+  
+  const handleProblemViewScreen = () => {
+    navigation.navigate('ViewReportedProblems', { councilId: Council })
+    closeMenu5()
+  }
+
   useEffect(() => {
     fetchElection()
     getAnnouncementsForResidents()
   }, [memberId, Council]);
 
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [notificationFound, setNotificationFound] = useState(false);
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch(
+        `${baseURL}notification/GetNotifications?councilId=${Council}&memberId=${memberId}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Notifications Found")
+        setNotificationFound(data.length > 0);
+        setNotifications(data);
+      } else {
+        console.error("Error fetching notifications:", data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const RenderNotification =  React.memo(({ item }) =>  {
+    return(
+    <TouchableOpacity style={styles.notificationCard}>
+      <Text style={styles.title1}>{item.title}</Text>
+      <Text style={styles.message}>{item.message}</Text>
+      <Text style={styles.timestamp}>{new Date(item.CreatedAt).toDateString()}</Text>
+      {/* <DividerLine/> */}
+    </TouchableOpacity>
+    )
+  })
+    
   return (
     <SafeAreaView style={styles.container}>
     <WavyBackground />
@@ -142,6 +204,9 @@ export default function ResidentScreen ({ route, navigation }) {
       
         <TouchableOpacity onPress={openMenu2}>
           <Image source={require('../assets/notification.png')} style={styles.icon} />
+          {announcementFound && 
+            <View style={styles.badge} />
+          }
         </TouchableOpacity>
         <Modal
         visible={menuVisible2}
@@ -217,9 +282,45 @@ export default function ResidentScreen ({ route, navigation }) {
           </View>
         </TouchableOpacity>
       </Modal>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={openMenu4}>
           <Image source={require('../assets/message.png')} style={styles.icon} />
+          {notificationFound && (
+        <View style={styles.badge} />
+      )}
         </TouchableOpacity>
+
+        <Modal
+                visible={menuVisible4}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={closeMenu4}
+              >
+                <TouchableOpacity style={styles.modalOverlay}>
+                  <View style={styles.menuContainer}>
+                    {/* Modal Header with Close Button */}
+                    <View style={styles.headerContainer2}>
+                      <Text style={styles.headerText}>Notifications</Text>
+                      <TouchableOpacity onPress={closeMenu4} style={styles.closeButton}>
+                        <Text style={styles.closeButtonText}>X</Text>
+                      </TouchableOpacity>
+                    </View>
+        
+                    {/* Modal Content */}
+                    <View style={styles.modalContent}>
+                    <FlatList
+                      data={notifications}
+                      keyExtractor={(item) => item.id.toString()}
+                      renderItem={({ item }) => <RenderNotification item={item} />}
+                      initialNumToRender={10} // Render only 10 items initially
+                      maxToRenderPerBatch={10} // Batch render 10 items
+                      windowSize={5} // Adjust the window size for rendering
+                      ListEmptyComponent={<Text style={styles.emptyText}>No notifications available.</Text>}
+                    />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </Modal>
+              
       </View>
     </View>
 
@@ -227,11 +328,56 @@ export default function ResidentScreen ({ route, navigation }) {
         <View style={styles.buttonsContainer}>
       <TouchableOpacity 
         style={styles.button} 
-        onPress={() => {navigation.navigate('ReportProblem', { councilId: Council })}}
+        onPress={openMenu5}
       >
         <Image source={require('../assets/ReportProblem.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Report Issue</Text>
       </TouchableOpacity>
+
+        <Modal
+          visible={menuVisibleForReportProblem}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={closeMenu5}
+        >
+          <View style={styles.modalOverlay} >
+            <View style={styles.menuContainer}>
+              {/* Modal Header with Close Button */}
+              <View style={styles.headerContainer2}>
+                <Text style={styles.headerText}>Report Problem</Text>
+                <TouchableOpacity onPress={closeMenu5} style={styles.closeButton}>
+                  <Text style={styles.closeButtonText}>X</Text>
+                </TouchableOpacity>
+              </View>
+
+        {/* Modal Content */}
+        <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleReportProblemScreen}
+          >
+            <Image
+              source={require('../assets/report.png')}
+              style={styles.buttonIcon}
+            />
+            <Text style={styles.buttonText}>Report Problem</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleProblemViewScreen}
+          >
+            <Image
+              source={require('../assets/viewReport.png')}
+              style={styles.buttonIcon}
+            />
+            <Text style={styles.buttonText}>View Reported</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+
 
       {isElectionActive ? (     
         <TouchableOpacity 
@@ -261,30 +407,38 @@ export default function ResidentScreen ({ route, navigation }) {
 
 
      {/* Menu Modal for Nominations*/}
-    
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={openMenu3}
-      >
-        <Image source={require('../assets/nominate.png')} style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>Nominate Panel</Text>
-      </TouchableOpacity>
-
+    {!isElectionActive? (
+            <TouchableOpacity 
+            style={styles.button} 
+            onPress={openMenu3}
+          >
+            <Image source={require('../assets/nominate.png')} style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Nominate Panel</Text>
+          </TouchableOpacity>
+    ):(      
+    <View 
+      style={styles.button2} 
+      onPress={{}}
+    >
+      <Image source={require('../assets/nominate.png')} style={styles.buttonIcon} />
+      <Text style={styles.buttonText}>Nominate Panel</Text>
+    </View>
+  )}
       <Modal
-  visible={menuVisibleForNomination}
-  transparent={true}
-  animationType="fade"
-  onRequestClose={closeMenu3}
->
-  <View style={styles.modalOverlay} >
-    <View style={styles.menuContainer}>
-      {/* Modal Header with Close Button */}
-      <View style={styles.headerContainer2}>
-        <Text style={styles.headerText}>Setup Nomination</Text>
-        <TouchableOpacity onPress={closeMenu3} style={styles.closeButton}>
-          <Text style={styles.closeButtonText}>X</Text>
-        </TouchableOpacity>
-      </View>
+        visible={menuVisibleForNomination}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={closeMenu3}
+      >
+        <View style={styles.modalOverlay} >
+          <View style={styles.menuContainer}>
+            {/* Modal Header with Close Button */}
+            <View style={styles.headerContainer2}>
+              <Text style={styles.headerText}>Setup Nomination</Text>
+              <TouchableOpacity onPress={closeMenu3} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>X</Text>
+              </TouchableOpacity>
+            </View>
 
       {/* Modal Content */}
       <View style={styles.modalContent}>
@@ -400,12 +554,27 @@ modalOverlay: {
   justifyContent: 'center',
   alignItems: 'center',
 },
-  menuContainer: {
-    width: '85%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
+menuContainer: {
+  width: '85%',
+  maxHeight: '90%', // Restricts height to 80% of the screen
+  backgroundColor: '#fff',
+  borderRadius: 10,
+  overflow: 'hidden',
+  position: 'absolute', // Use if the container is floating
+  // top: 20, // Adjust to prevent going off-screen
+  // bottom: 20,
+},
+badge: {
+  position: 'absolute',
+  top: -2, // Adjust as needed for the badge's position
+  right: -2, // Adjust as needed for the badge's position
+  width: 14, // Badge size
+  height: 14,
+  backgroundColor: 'red', // Badge color
+  borderRadius: 10, // Make it circular (half of width/height)
+  borderWidth: 1, // Optional: border for better visibility
+  borderColor: '#fff', // Matches the background (for example, white)
+},
   headerContainer2: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -456,6 +625,38 @@ modalOverlay: {
   metaData: {
     fontSize: 12,
     color: '#888',
+  },
+  notificationCard: {
+    backgroundColor: "#f0f0f0",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  title1: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+    color: 'black',
+  },
+  message: {
+    fontSize: 14,
+    color: "#666",
+  },
+  timestamp: {
+    fontSize: 12,
+    color: "#aaa",
+    marginTop: 8,
+  },
+  emptyText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#aaa",
+    marginTop: 20,
   },
 footer: {
   position: 'absolute',

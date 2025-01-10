@@ -33,6 +33,7 @@ export default function MeetingScreen ({route, navigation}) {
   const [selectedId1, setSelectedId1] = useState(0)
   const [menuVisible1, setMenuVisible1] = useState(false);
   const openMenu1 = (id) => {
+    getMeetingMinutes(id);
     setSelectedId1(id); 
     setMenuVisible1(true); 
   };
@@ -64,8 +65,11 @@ export default function MeetingScreen ({route, navigation}) {
       console.error('Failed to fetch user data:', error);
     }
   };
-
+  
+  const [loading2, setLoading2] = useState(false)
   const getMeeting = async() =>{
+    setLoading2(true)
+    await new Promise(resolve => setTimeout(resolve, 1500))
     try{
       const response = await fetch(`${baseURL}meeting/getMeetings?councilId=${councilId}`)
       if(response.ok){
@@ -80,6 +84,7 @@ export default function MeetingScreen ({route, navigation}) {
     catch{
       console.log('Unable to Fetch Meetings data')
     }
+    setLoading2(false)
   }
 
   const addMeetingMinutes = async(meetingId) =>{
@@ -116,23 +121,40 @@ export default function MeetingScreen ({route, navigation}) {
     }
     setLoading(false)
   }
-
+  const [loadingForMinutes, setLoadingForMinutes] = useState(false)
   // Fetch meeting minutes
   const getMeetingMinutes = async (meetingId) => {
+    setLoadingForMinutes(true)
+    await new Promise(resolve => setTimeout(resolve, 1000))
     try {
       const response = await fetch(
-        `${baseURL}/api/Meetings/GetMeetingMinutes?meetingId=${meetingId}&councilId=${councilId}`
+        `${baseURL}Meeting/GetMeetingMinutes?meetingId=${meetingId}&councilId=${councilId}`
       );
       if (response.ok) {
         const data = await response.json();
-        setMeetingMinutesData(data);
+        const meetingMinutes = data.map((meeting) => ({
+          MeetingId: meeting.MeetingId,
+          Title: meeting.Title, 
+          Description: meeting.Description,
+          ScheduledDate: meeting.ScheduledDate,
+          Address: meeting.Address,
+          MeetingType: meeting.MeetingType,
+          CreatedAt: meeting.CreatedAt,
+          MinutesId: meeting.MinutesId,
+          Minutes: meeting.Minutes,
+          RecordedBy: meeting.RecordedBy,
+          RoleName: meeting.RoleName?.[0] || "N/A", 
+          MinutesCreatedAt: meeting.MinutesCreatedAt,
+        }));
+        setMeetingMinutesData(meetingMinutes);
+        
       } else {
         console.log("No meeting minutes found.");
       }
     } catch (error) {
       console.error("Error fetching meeting minutes:", error);
     } finally {
-      setLoading(false);
+      setLoadingForMinutes(false);
     }
   };
 
@@ -209,7 +231,7 @@ export default function MeetingScreen ({route, navigation}) {
           <View style={styles.menuContainer}>
             {/* Modal Header with Close Button */}
             <View style={styles.headerContainer2}>
-              <Text style={styles.headerText}>Add Minutes</Text>
+              <Text style={styles.headerText}>Meeting Minutes</Text>
               <TouchableOpacity onPress={closeMenu1} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>X</Text>
               </TouchableOpacity>
@@ -217,12 +239,14 @@ export default function MeetingScreen ({route, navigation}) {
 
             {/* Modal Content */}
             <View style={styles.modalContent}>
-            <Text style={{color:'black', fontWeight:'600'}}></Text>  
+          
             {meetingMinutesData.length > 0 ? (
               <FlatList
                 data={meetingMinutesData}
                 keyExtractor={(item) => item.MinutesId.toString()}
                 renderItem={renderMeeting}
+                //refreshing={loadingForMinutes}
+               // onRefresh={getMeetingMinutes}
               />
               ) : (
               <Text style={styles.noDataText}>No Meeting Minutes Found</Text>
@@ -237,15 +261,15 @@ export default function MeetingScreen ({route, navigation}) {
   );
 
   const renderMeeting = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.title}>Meeting Title: {item.Title}</Text>
-      <Text style={styles.description}>Description: {item.Description}</Text>
-      <Text style={styles.text}>Type: {item.MeetingType}</Text>
-      <Text style={styles.text}>Address: {item.Address}</Text>
-      <Text style={styles.text}>Scheduled Date: {new Date(item.ScheduledDate).toLocaleDateString()}</Text>
-      <Text style={styles.text}>Minutes: {item.Minutes}</Text>
-      <Text style={styles.text}>Recorded By: {item.RecordedBy}</Text>
-      <Text style={styles.text}>Minutes Recorded On: {new Date(item.MinutesCreatedAt).toLocaleDateString()}</Text>
+    <View style={styles.card2}>
+      <Text style={styles.title}>Minutes: {item.Minutes}</Text>
+      <Text style={styles.metaData}>
+                    ⁓ {item.RecordedBy} ({item.RoleName})
+                  </Text>
+      <Text style={styles.metaData}>
+                      {`\t`} {new Date(item.MinutesCreatedAt).toDateString()}
+                  </Text>
+      <DividerLine/>
     </View>
   );
 
@@ -259,6 +283,8 @@ export default function MeetingScreen ({route, navigation}) {
           data={meetingsData}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
+          refreshing={loading2}
+          onRefresh={getMeeting}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
                 <Text style={{color: 'black', textAlign : 'center', fontSize : 17}}>No Meetings Scheduled!</Text>
@@ -270,7 +296,7 @@ export default function MeetingScreen ({route, navigation}) {
         <FAB
         icon="plus"
         style={styles.fab}
-        color="#000"
+        color="#F0C38E"
         onPress={() => navigation.navigate('ScheduleMeeting', { memberID: memberId, councilId: councilId })}
       />
         <Image
@@ -294,7 +320,7 @@ const styles = StyleSheet.create({
     marginBottom: 50,
     color: 'black',
     margin: 10,
-    fontSize: 30,
+    fontSize: 35,
     textAlign: 'center',
   },
   footer: {
@@ -311,7 +337,7 @@ const styles = StyleSheet.create({
     bottom: 90,
     shadowColor: '#000', // Add a shadow for a floating card effect
     shadowOpacity: 1,
-    backgroundColor: '#F0C38E',
+    backgroundColor: '#555',
   },
   desc: {
     width: '100%', // Occupies the full width of the modal content
@@ -352,12 +378,42 @@ const styles = StyleSheet.create({
     borderRadius : 35,
     width: Dimensions.get('window').width - 25, 
   },
+  // card2: {
+  //   flex: 1,
+  //   marginHorizontal: 15, // Add balanced horizontal margins
+  //   backgroundColor: '#fff',
+  //   marginBottom: 15,
+  //   shadowColor: '#000', // Add a shadow for a floating card effect
+  //   shadowOpacity: 0.1,
+  //   shadowRadius: 5,
+  //   elevation: 5, // For Android shadow
+  //   padding: 10, // Add padding inside the card
+  //   height: '90%',
+  //   borderRadius : 25,
+  //   width: '90%', 
+  // },
   title: {
-    fontSize: 20, // Slightly larger for a modern touch
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#222', // Darker for contrast
-    marginBottom: 5, // Space below the title
-  },  
+    color: '#333',
+    marginBottom: 10
+  },
+  description: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
+    marginBottom : 10,
+  },
+  metaData: {
+    fontSize: 12,
+    color: '#888',
+   },
+  // title: {
+  //   fontSize: 20, // Slightly larger for a modern touch
+  //   fontWeight: 'bold',
+  //   color: '#222', // Darker for contrast
+  //   marginBottom: 5, // Space below the title
+  // },  
   contentContainer: {
     flex: 1,
     paddingHorizontal: 0,
@@ -429,9 +485,10 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
     },
     modalContent: {
-      paddingHorizontal: 20,
-      paddingVertical: 15,
+      paddingHorizontal: 15,
+      paddingVertical: 5,
       alignItems: 'flex-start', // Align content to the start for better readability
+      justifyContent: 'flex-start'
     },
     actionButton2: {
       backgroundColor: '#F0C38E',

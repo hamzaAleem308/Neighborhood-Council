@@ -5,6 +5,7 @@ import { FAB, IconButton, Title } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import  baseURL  from '../Api';
 import { useFocusEffect } from '@react-navigation/native';
+import WavyBackground2 from '../../Background/WavyBackground2';
 
 
 export default function Project({navigation, route }) {
@@ -105,18 +106,18 @@ export default function Project({navigation, route }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <WavyBackground />
+      <WavyBackground2 />
 
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Projects</Text>
       </View>
-      <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Create Election', {councilID: councilId})}}>
+      <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('ManageProjects', {councilID: councilId})}}>
           <Text style={styles.signInButtonText}>Manage Project</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('Nominate Candidate' , {councilID: councilId})}}>
+        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('ProjectDetails' , {councilID: councilId})}}>
             <Text style={styles.signInButtonText}>Project Details</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('View Election' , {councilID: councilId})}}>
+        <TouchableOpacity style={styles.signInButton} onPress={()=>{navigation.navigate('ProjectLogs' , {councilID: councilId})}}>
             <Text style={styles.signInButtonText}>Project Logs</Text>
         </TouchableOpacity>
 
@@ -138,7 +139,7 @@ export default function Project({navigation, route }) {
       
       <FAB
             style={styles.fab}
-            color = {'black'}
+            color = {'#F0C38E'}
             icon={'plus'} // Switch between plus and close icon
             onPress={ () => navigation.navigate('AddProject', { memberID: memberId, councilId : councilId })}
           />
@@ -164,10 +165,11 @@ const styles = StyleSheet.create({
     alignContent : 'center',
     marginTop: 0,
     marginBottom: 20,
+    bottom: 50,
   },
   headerText: {
     fontFamily: 'KronaOne-Regular',
-    fontSize: 20,
+    fontSize: 30,
     color: '#000',
     marginBottom: 55,
   },
@@ -214,7 +216,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: 90,
-    backgroundColor: '#F0C38E',
+    backgroundColor: '#555',
   },
   signInButton: {
     top: 20,

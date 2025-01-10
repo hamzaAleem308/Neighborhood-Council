@@ -14,7 +14,7 @@ export default function Announcement({navigation, route }) {
   const [memberId, setMemberId] = useState(null);
 
   const [announcements, setAnnouncements] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
 
   useEffect(() => {
@@ -39,6 +39,8 @@ export default function Announcement({navigation, route }) {
 
   // Function to fetch announcements data
   const fetchAnnouncements = async () => {
+    setLoading(true)
+    await new Promise(resolve => setTimeout(resolve,1500))
     try {
       const response = await fetch(
         `${baseURL}Announcement/getAnnouncementsForCouncil?councilId=${councilId}`
@@ -68,9 +70,8 @@ export default function Announcement({navigation, route }) {
       }
     } catch (error) {
       console.error("Error fetching announcements:", error);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
 
@@ -83,7 +84,7 @@ export default function Announcement({navigation, route }) {
   useFocusEffect(
     useCallback(()=>{
       fetchAnnouncements()
-    } , [memberId, councilId, loading])
+    } , [memberId, councilId])
   )
 
   // useEffect(() => {
@@ -108,25 +109,22 @@ export default function Announcement({navigation, route }) {
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Announcements</Text>
       </View>
-    {loading ? (
-      <ActivityIndicator size="large" color="#0000ff" style={{justifyContent: 'center'}} />
-      ) : (
     <View style={styles.contentContainer}>
             <FlatList
               data={announcements}
               keyExtractor={(item) => item.AnnouncementId.toString()}
               renderItem={renderItem}
+              refreshing={loading}
+             onRefresh={fetchAnnouncements}
               contentContainerStyle={styles.listContent}
               ListEmptyComponent={
                 <Text style={{color: 'black', textAlign : 'center', fontSize : 17}}>No Announcements Found!</Text>
               }
             />
           </View>
-      )}
-      
       <FAB
             style={styles.fab}
-            color = {'black'}
+            color = '#F0C38E'
             icon={'plus'} // Switch between plus and close icon
             onPress={ () => navigation.navigate('AddAnnouncement', { memberID: memberId, councilId : councilId })}
           />
@@ -202,7 +200,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: 90,
-    backgroundColor: '#F0C38E',
+    backgroundColor: '#555',
   },
   footer: {
     position: 'absolute',

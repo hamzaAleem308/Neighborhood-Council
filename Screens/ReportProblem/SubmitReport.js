@@ -105,7 +105,7 @@ export default function SubmitReport({ route, navigation }) {
     const result = await response.json();
     if (response.ok) {
       Alert.alert('Success', result.Message);
-      navigation.replace('ReportProblem', {councilId : councilId})
+      navigation.goBack();
     } else {
       Alert.alert('Error', result.Message);
     }

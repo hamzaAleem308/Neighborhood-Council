@@ -5,7 +5,7 @@ import baseURL from '../Api';
 import { baseImageURL } from '../Api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function ViewIssues({ navigation, route }) {
+export default function ViewReportedProblems({ navigation, route }) {
   const { width } = useWindowDimensions(); // screen width
   const { councilId } = route.params;
   const [problemData, setProblemData] = useState([]);
@@ -38,7 +38,7 @@ export default function ViewIssues({ navigation, route }) {
 
   const getReportedProblem = async () => {
     try {
-      const response = await fetch(`${baseURL}ReportProblem/GetReportedProblems?councilId=${councilId}`);
+      const response = await fetch(`${baseURL}ReportProblem/GetReportedProblems?councilId=${councilId}&memberId=${memberId}`);
       if (response.ok) {
         const data = await response.json(); // Await the JSON parsing
         if (data && data.length > 0) {
@@ -127,12 +127,12 @@ export default function ViewIssues({ navigation, route }) {
     <View style={styles.card}>
       <View style={styles.headerContainer}>
         <Text style={styles.title}>{item.Title}</Text>
-        <Text style={styles.status(item.Status)}>{item.Status}</Text>
+        {/* <Text style={styles.status(item.Status)}>{item.Status}</Text> */}
       </View>
       <Text style={styles.description}>{item.Description}</Text>
       {item.VisualEvidence ? (
         <Image
-        source={{ uri: `${baseImageURL}${item.VisualEvidence}` }} // Construct full URL
+        source={{ uri: `${baseImageURL}${item.VisualEvidence}` }} 
         style={styles.image}
         resizeMode="cover"
       />
@@ -143,7 +143,13 @@ export default function ViewIssues({ navigation, route }) {
         <Text style={styles.metaText}>Type: {item.ProblemType}</Text>
         <Text style={styles.metaText}>Category: {item.Category}</Text>
       </View>
-      <View style={styles.buttonContainer}>
+      <TouchableOpacity
+            style={[styles.button, styles.tickButton]} 
+            onPress={() => navigation.navigate('ViewProblemProgress',{problemId: item.ProblemId, problemStatus: item.Status, councilId: councilId, memberId: memberId})}
+          >
+            <Text style={styles.buttonText}>Click to View Progress!</Text>
+          </TouchableOpacity>
+      {/* <View style={styles.buttonContainer}>
         {item.Status === 'Pending' && (
           <TouchableOpacity
             style={[styles.button, styles.tickButton]}
@@ -174,7 +180,7 @@ export default function ViewIssues({ navigation, route }) {
           </TouchableOpacity>
         </View>
         )}
-      </View>
+      </View> */}
     </View>
   );
 // For Open button text
@@ -295,6 +301,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     marginHorizontal: 5,
+    marginTop: 10,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',

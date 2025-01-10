@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Image, Modal, SafeAreaView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import WavyBackground from '../../Background/WavyBackground';
 import { FAB } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import baseURL from '../Api'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -44,7 +44,7 @@ export default function ReportProblem ({route}) {
     }
   };
 
-
+const [allProblemsData, setAllProblemsData] = useState([])
   const getProblemStatusSummary = async() => {
     try{
       const response = await fetch(`${baseURL}reportProblem/getProblemStatusSummary?memberId=${memberId}&councilId=${councilId}`)
@@ -52,7 +52,25 @@ export default function ReportProblem ({route}) {
             const json = await response.json()
             console.log('Status Summary Fetched Successfully!')
             console.log(json)
-        }
+            setTotal(json.Total)
+            const mapCounts = json.StatusCounts.map((counts) => ({
+              Status: counts.Status,
+              count: counts.Count
+            }))
+            setAllProblemsData(mapCounts)
+            //const firstData = mapCounts[0]
+            mapCounts.forEach(element => {
+              if(element.Status === 'Pending'){
+                setPending(element.count)
+              }
+              if(element.Status === 'Closed'){
+                setClosed(element.count)
+              }
+              if(element.Status === 'Opened'){
+                setOpen(element.count)
+              }
+            });
+            }
       else{
         Alert.alert('Failed to Fetch Status Summary')
       }
@@ -62,9 +80,11 @@ export default function ReportProblem ({route}) {
     }
   }
 
-  useEffect(() => {
-    getProblemStatusSummary()
-  },[memberId, councilId])
+  useFocusEffect(
+    useCallback(() => {
+      getProblemStatusSummary()
+    }, [memberId, councilId])
+  )
 
 const handlePress = () =>{
   if(preference == null){
@@ -108,7 +128,7 @@ const handlePress = () =>{
       <FAB
         icon="plus"
         style={styles.fab}
-        color="#000"
+        color="#F0C38E"
         onPress={openMenu}
       />
         <Modal
@@ -177,7 +197,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: 90,
-    backgroundColor: '#F0C38E',
+    backgroundColor: '#555',
   },
   footerContainer: {
     position: 'absolute',

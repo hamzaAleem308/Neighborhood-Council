@@ -32,6 +32,7 @@ export default function ViewNominations ({route, navigation}) {
               PanelMembers: candidate.PanelMembers.map((member) => ({
                 MemberId: member.MemberId,
                 MemberName: member.MemberName,
+                MemberRole: member.MemberRole
               })),
             }));
             console.log('Transformed Data for FlatList:', flatListData);
@@ -68,12 +69,13 @@ export default function ViewNominations ({route, navigation}) {
        <Text style={styles.candidateName}>Candidate: {item.CandidateName}</Text>
        <Text style={styles.panelName}>Panel Name: {item.PanelName}</Text>
        <View style={{ flexDirection: 'row', marginBottom : 10 }}>
-       <Text style={styles.membersHeading}>Panel Members:</Text>
-       
+       <Text style={styles.membersHeading}>Panel Members:   </Text>
+       <View>
        {item.PanelMembers.map((member) => (
-         <Text key={member.MemberId} style={styles.memberName}> - {member.MemberName}
+         <Text key={member.MemberId} style={styles.memberName}> {member.MemberName} ⁓{member.MemberRole},
          </Text>
        ))}
+       </View>
        </View>
      </View>
    );

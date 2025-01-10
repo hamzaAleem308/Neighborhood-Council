@@ -7,7 +7,7 @@ import  baseURL  from '../Api';
 
 export default function ScheduleMeeting ({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
-  const { memberId, councilId} = route.params;
+  const { memberId, councilId, problemId, projectId} = route.params;
   const [title, setTitle] = useState('')
   const [agenda, setAgenda] = useState('')
   const [location, setLocation] = useState('')
@@ -27,6 +27,8 @@ export default function ScheduleMeeting ({ route, navigation }) {
       title : title,
       description : agenda,
       address : location,
+      problem_id : problemId? problemId : 0,
+      project_id : projectId? projectId: 0,
       council_id : councilId,
       scheduled_date : meetingDate,
       meeting_type : type

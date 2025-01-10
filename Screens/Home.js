@@ -141,6 +141,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CouncilCard from '../Cards/CouncilCard';
 import { useFocusEffect } from '@react-navigation/native';
 import WavyBackground2 from '../Background/WavyBackground2';
+import baseURL  from './Api';
 
 export default function HomeScreen({ route, navigation }) {
   const { width } = useWindowDimensions();
@@ -183,8 +184,11 @@ export default function HomeScreen({ route, navigation }) {
   //   GetCouncils();
   // }, []);
 
+  const [loading, setLoading] = useState(false)
   const GetCouncils = async () => {
     console.log("Member ID: " + memberID)
+    setLoading(true)
+    await new Promise(resolve => setTimeout(resolve, 1500))
     try {
       const response = await fetch(`${baseURL}Council/GetCouncils?memberId=${memberID}`, {
         method: 'GET',
@@ -192,20 +196,22 @@ export default function HomeScreen({ route, navigation }) {
           'Content-Type': 'application/json',
         },
       });
+      const json = await response.json();
       if (response.ok) {
-        const json = await response.json();
         console.log("Councils loaded successfully.")
+        console.log(json)
         setCouncilData(json);
       } else if( response.status == 204) {
-        Alert.alert('No Councils Found')
+        Alert.alert('No Councils Found ')
       }
       else{
-        Alert.alert('Error', 'Failed to load Data');
+        Alert.alert('Error', 'Failed to load Data' + json);
       }
     } catch (error) {
       console.log('An error occurred while loading Data')
       //Alert.alert('Error', '');
     }
+    setLoading(false)
   };
 
   useFocusEffect(
@@ -242,7 +248,7 @@ export default function HomeScreen({ route, navigation }) {
 
   const renderCouncilCard = ({ item }) => (
     <View style={styles.cardContainer}>
-      <CouncilCard council={item} navigation={navigation} member={memberId} />
+      <CouncilCard council={item} navigation={navigation} member={memberId} displayPicture={item.DisplayPictureUrl}/>
     </View>
   );
 
@@ -263,6 +269,8 @@ export default function HomeScreen({ route, navigation }) {
           data={councilData}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderCouncilCard}
+          refreshing={loading}
+          onRefresh={GetCouncils}
           ListEmptyComponent={
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
               <Text style={{ textAlign: 'center', color: 'black', fontSize: 20 }}>
@@ -277,7 +285,7 @@ export default function HomeScreen({ route, navigation }) {
       <FAB
         icon="plus"
         style={styles.fab}
-        color="#000"
+        color="#F0C38E"
         onPress={() => navigation.navigate('JoinCouncil', { memberID: memberId })}
       />
         <FAB
@@ -350,8 +358,8 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
   },
   listContent: {
-    marginTop: 50,
-    paddingBottom: 80,
+    marginTop: 10,
+    paddingBottom: 0,
   },
   cardContainer: {
     borderRadius: 20,
@@ -361,7 +369,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: 90,
-    backgroundColor: '#F0C38E',
+    backgroundColor: '#555',
   },
   fab1: {
     position: 'absolute',

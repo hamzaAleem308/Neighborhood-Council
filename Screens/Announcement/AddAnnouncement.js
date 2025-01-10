@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, SafeAreaView, St
 import WavyBackground from '../../Background/WavyBackground';
 import WavyBackground2 from '../../Background/WavyBackground2';
 import { Button } from 'react-native-paper';
+import baseURL from '../Api';
 
 export default function AddAnnouncement({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
