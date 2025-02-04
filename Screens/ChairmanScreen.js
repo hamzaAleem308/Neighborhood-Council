@@ -7,7 +7,7 @@ import baseURL from './Api'
 
 export default function ChairmanScreen ({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
-  const {Council, councilName, councilDescription} = route.params;
+  const {Council, councilName, councilDescription, role} = route.params;
   
   const [memberId, setMemberId] = useState(null);
   const [phoneNo, setPhoneNo] = useState(null);
@@ -181,7 +181,7 @@ export default function ChairmanScreen ({ route, navigation }) {
     {/* Header */}
     <View style={styles.headerContainer}>
       <Text style={styles.welcomeText}>Welcome</Text>
-      <Text style={styles.nameText}>{fullName}</Text>
+      <Text style={styles.nameText}>{fullName}<Text style={{color: 'black', fontSize: 15}}> ⁓{role}</Text></Text>
 
       {/* Icons */}
       <View style={styles.iconContainer}>
@@ -307,7 +307,7 @@ export default function ChairmanScreen ({ route, navigation }) {
 
     {/* Buttons */}
     <View style={styles.buttonsContainer}>
-      <TouchableOpacity style={styles.button} onPress={openMenu5}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ReportProblem', { councilId: Council })}>
         <Image source={require('../assets/ReportProblem.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Report Issue</Text>
 
@@ -364,7 +364,7 @@ export default function ChairmanScreen ({ route, navigation }) {
         <Image source={require('../assets/projects.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Projects</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}  onPress={() => {navigation.navigate('ViewIssues', {councilId : Council, memberId : memberId})}}>
+      <TouchableOpacity style={styles.button}  onPress={() => {navigation.navigate('ComplaintDiaryForChairman', {councilId : Council, memberId : memberId})}}>
         <Image source={require('../assets/ViewIssues.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>View Problems</Text>
       </TouchableOpacity>

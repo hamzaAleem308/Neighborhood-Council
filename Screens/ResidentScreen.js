@@ -7,7 +7,7 @@ import DividerLine from '../Background/LineDivider';
 
 export default function ResidentScreen ({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
-  const {Council, councilName, councilDescription} = route.params;
+  const {Council, councilName, councilDescription, role} = route.params;
   
   const [memberId, setMemberId] = useState(null);
   const [phoneNo, setPhoneNo] = useState(null);
@@ -85,7 +85,6 @@ export default function ResidentScreen ({ route, navigation }) {
         const data = await response.json(); 
   
         if (data && data.length > 0) {
-          
           const annData = data.map((ann) => ({
             AnnouncementId: ann.AnnouncementId,
             Title: ann.Title,
@@ -105,7 +104,7 @@ export default function ResidentScreen ({ route, navigation }) {
         console.log("Failed to fetch announcements, Status:", response.status);
       }
     } catch (error) {
-      console.error("Error Fetching Announcements: ", error);
+      console.log("Error Fetching Announcements: ", error);
     }
   };
   
@@ -121,7 +120,7 @@ export default function ResidentScreen ({ route, navigation }) {
         setIsElectionActive(false)
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to load candidates.');
+      console.log('Error', 'Failed to load candidates.');
       console.error(error);
     }
   };
@@ -166,10 +165,10 @@ export default function ResidentScreen ({ route, navigation }) {
         setNotificationFound(data.length > 0);
         setNotifications(data);
       } else {
-        console.error("Error fetching notifications:", data);
+        console.log("Error fetching notifications:", data);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.log("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -189,16 +188,87 @@ export default function ResidentScreen ({ route, navigation }) {
     </TouchableOpacity>
     )
   })
-    
+
+  const RenderAnnouncements = React.memo(({ item }) => {
+    return(
+      <View style={styles.announcementCard}>
+            <Text style={styles.title}>{item.Title}</Text>
+            <Text style={styles.description}>{item.Description}</Text>
+            <Text style={styles.metaData}>
+            ⁓ {item.MemberName} ({item.RoleName}) | Date: {new Date(item.Date).toDateString()}
+          </Text>
+        </View>
+    )
+  })
+  const fetchRoleName = (role) =>{
+    if(role === 'Member')
+      return 'Resident';
+    else 
+    return role;
+  }
+
+  const handleSwitchCouncilScreen = () => {
+    navigation.navigate('SwitchCouncil', { councilId: Council, memberId: memberId, councilName: councilName })
+    closeMenu()
+  }
+  
+  const handleLeaveCouncil = () => {
+    Alert.alert(
+      'Are you sure?',
+      'Do you want to leave this Council? Doing so will remove you from the council and you will no longer be able to participate in its activities.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Ok',
+          onPress: async () => {
+            try {
+              closeMenu();
+              leaveCouncil(Council, memberId);
+              // await AsyncStorage.removeItem('userToken');
+              // navigation.replace('Login');
+              // console.log('Data Cleared and Logged Out.')
+            } catch (error) {
+              Alert.alert('Error', 'Failed to log out.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // LeaveCouncil API Call
+const leaveCouncil = async (councilId, memberId) => {
+  try {
+    const response = await fetch(`${baseURL}Council/LeaveCouncil?councilId=${councilId}&memberId=${memberId}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      Alert.alert(result); // Display success message
+      navigation.replace('HomeScreen',{ memberID : memberId})
+    } else {
+      const error = await response.json();
+      Alert.alert(`Error: ${error}`);
+    }
+  } catch (error) {
+    console.error('Error leaving council:', error);
+    Alert.alert('An error occurred. Please try again later.');
+  }
+};
+
   return (
     <SafeAreaView style={styles.container}>
     <WavyBackground />
 
     {/* Header */}
     <View style={styles.headerContainer}>
-      <Text style={styles.welcomeText}>Welcome</Text>
-      <Text style={styles.nameText}>{fullName}</Text>
-
+      <Text style={styles.welcomeText}>Welcome to {councilName}</Text>
+      <Text style={styles.nameText}>{fullName}<Text style={{color: 'black', fontSize: 15}}> ⁓{role}</Text></Text>
+      {/* <Text style={styles.nameTextForRole}>You're as {role} in this Council</Text> */}
       {/* Icons */}
       <View style={styles.iconContainer}>
       
@@ -231,15 +301,10 @@ export default function ResidentScreen ({ route, navigation }) {
             <FlatList
               data={announcementsData}
               keyExtractor={(item) => item.AnnouncementId.toString()}
-              renderItem={({ item }) => (
-                <View style={styles.announcementCard}>
-                  <Text style={styles.title}>{item.Title}</Text>
-                  <Text style={styles.description}>{item.Description}</Text>
-                  <Text style={styles.metaData}>
-                    ⁓ {item.MemberName} ({item.RoleName}) | Date: {new Date(item.Date).toDateString()}
-                  </Text>
-                </View>
-              )}
+              renderItem={({ item }) => <RenderAnnouncements item={item} />}
+              initialNumToRender={10} // Render only 10 items initially
+              maxToRenderPerBatch={10} // Batch render 10 items
+              windowSize={5}
               ListEmptyComponent={<Text style={{color : 'black'}}>No Announcements Found!</Text>}
             />
           </View>
@@ -275,9 +340,31 @@ export default function ResidentScreen ({ route, navigation }) {
             <Text style={{color:'black', fontWeight:'600', marginTop: 20}}>Description</Text>  
             <Text style={{color:'black', textAlign : 'left'}}>{councilDescription}</Text>
             <Text style={{color:'black', fontWeight:'600', marginTop: 20}}>About the App:</Text>  
-            <Text style={{color:'black', textAlign : 'left'}}>
+            <Text style={{color:'black', textAlign : 'left', marginBottom: 10}}>
               The app facilitates community involvement by allowing residents to report issues, form committees, and participate in democratic processes, promoting collaborative problem-solving and local governance.
             </Text>
+            <View style={{flex: 1, flexDirection: 'row'}}>
+            {/* <TouchableOpacity
+            style={styles.buttonInsideInfoForLeaving}
+            onPress={handleLeaveCouncil}
+          >
+            <Image
+              source={require('../assets/leave.png')}
+              style={styles.buttonIconInsideInfo}
+            />
+            <Text style={styles.buttonTextInsideInfoForLeaving}>Leave Council</Text>
+              </TouchableOpacity> */}
+              <TouchableOpacity
+            style={styles.buttonInsideInfo}
+            onPress={handleSwitchCouncilScreen}
+          >
+            <Image
+              source={require('../assets/switch.png')}
+              style={styles.buttonIconInsideInfo}
+            />
+            <Text style={styles.buttonTextInsideInfo}>Switch Council</Text>
+              </TouchableOpacity>
+              </View>
             </View>
           </View>
         </TouchableOpacity>
@@ -319,16 +406,17 @@ export default function ResidentScreen ({ route, navigation }) {
                     </View>
                   </View>
                 </TouchableOpacity>
-              </Modal>
-              
+              </Modal> 
       </View>
+
+      
     </View>
 
     {/* Buttons */}
         <View style={styles.buttonsContainer}>
       <TouchableOpacity 
         style={styles.button} 
-        onPress={openMenu5}
+        onPress={() => navigation.navigate('ReportProblem', { councilId: Council })}
       >
         <Image source={require('../assets/ReportProblem.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Report Issue</Text>
@@ -350,7 +438,7 @@ export default function ResidentScreen ({ route, navigation }) {
                 </TouchableOpacity>
               </View>
 
-        {/* Modal Content */}
+        {/* Modal Content For Report Problem*/}
         <View style={styles.modalContent}>
           <TouchableOpacity
             style={styles.button}
@@ -377,8 +465,6 @@ export default function ResidentScreen ({ route, navigation }) {
         </View>
       </Modal>
 
-
-
       {isElectionActive ? (     
         <TouchableOpacity 
           style={styles.button} 
@@ -399,7 +485,7 @@ export default function ResidentScreen ({ route, navigation }) {
 
       <TouchableOpacity 
         style={styles.button} 
-        onPress={() => {navigation.navigate('ProjectsScreen', { councilId: Council })}}
+        onPress={()=>{navigation.navigate('ProjectDetails' , {councilID: Council})}}
       >
         <Image source={require('../assets/projects.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Projects</Text>
@@ -473,7 +559,7 @@ export default function ResidentScreen ({ route, navigation }) {
     <Image
       source={require('../assets/Footer.png')}
       style={[styles.footer, { width: width }]}
-      resizeMode="stretch" 
+       resizeMode="stretch" 
     />
 
   </SafeAreaView>
@@ -491,12 +577,19 @@ headerContainer: {
 },
 welcomeText: {
   fontFamily: 'KronaOne-Regular',
-  fontSize: 24,
+  fontSize: 20,
   fontWeight: 'bold',
   color: 'black',
 },
 nameText: {
-  fontSize: 20,
+  fontSize: 18,
+  top : 5,
+  fontWeight: '600',
+  color: 'black',
+},
+nameTextForRole: {
+  marginTop: 5,
+  fontSize: 16,
   top : 5,
   fontWeight: '600',
   color: 'black',
@@ -548,6 +641,42 @@ buttonText: {
   fontWeight: 'bold',
   color: 'black',
 },
+buttonInsideInfo: {
+  width: screenWidth * 0.4, 
+  backgroundColor: '#FEF3C7',
+  borderRadius: 15,
+  paddingVertical: 5,
+  paddingHorizontal: 10,
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginVertical: 5,
+},
+buttonInsideInfoForLeaving: {
+  width: screenWidth * 0.4, 
+  backgroundColor: '#FEE2E2',
+  borderRadius: 15,
+  paddingVertical: 5,
+  paddingHorizontal: 10,
+  marginLeft: 5,
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginVertical: 5,
+},
+buttonIconInsideInfo: {
+  width: 30,
+  height: 30,
+  marginRight: 10,
+},
+buttonTextInsideInfo: {
+  fontSize: 13,
+  fontWeight: 'bold',
+  color: 'black',
+},
+buttonTextInsideInfoForLeaving: {
+  fontSize: 13,
+  fontWeight: 'bold',
+  color: 'red',
+},
 modalOverlay: {
   flex: 1,
   backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -568,8 +697,9 @@ badge: {
   position: 'absolute',
   top: -2, // Adjust as needed for the badge's position
   right: -2, // Adjust as needed for the badge's position
-  width: 14, // Badge size
-  height: 14,
+  width: 16, // Badge size
+  height: 16
+  ,
   backgroundColor: 'red', // Badge color
   borderRadius: 10, // Make it circular (half of width/height)
   borderWidth: 1, // Optional: border for better visibility
@@ -601,15 +731,15 @@ badge: {
     paddingBottom : 30
   },
   announcementCard: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 10,
-    shadowColor: '#000',
+    backgroundColor: "#f0f0f0",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowRadius: 4,
+    elevation: 2,
   },
   title: {
     fontSize: 16,

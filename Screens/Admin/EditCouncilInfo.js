@@ -13,9 +13,10 @@ import {
 import WavyBackground from '../../Background/WavyBackground';
 import WavyBackground2 from '../../Background/WavyBackground2';
 
-export default function EditCouncilInfo() {
+export default function EditCouncilInfo({route}) {
   const { width } = useWindowDimensions(); // screen width
   const [name, setName] = useState('');
+  const {Name, Desc} = route.params;
   const [desc, setDesc] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -23,40 +24,36 @@ export default function EditCouncilInfo() {
   useEffect(() => {
     const fetchCouncilInfo = async () => {
       // Simulate API call to fetch council data
-      const councilData = {
-        name: 'Neighborhood Council',
-        description: 'A council to manage neighborhood issues and events.',
-      };
 
-      setName(councilData.name);
-      setDesc(councilData.description);
+      setName(Name);
+      setDesc(Desc);
     };
 
     fetchCouncilInfo();
   }, []);
 
-  const handleSave = async () => {
-    setLoading(true);
+  // const handleSave = async () => {
+  //   setLoading(true);
 
-    // Simulate saving the updated council data
-    try {
-      const updatedCouncilData = {
-        name,
-        description: desc,
-      };
+  //   // Simulate saving the updated council data
+  //   try {
+  //     const updatedCouncilData = {
+  //       name,
+  //       description: desc,
+  //     };
 
-      console.log('Saving council data:', updatedCouncilData);
-      // Perform API call here
-      // await updateCouncilAPI(updatedCouncilData);
+  //     console.log('Saving council data:', updatedCouncilData);
+  //     // Perform API call here
+  //     // await updateCouncilAPI(updatedCouncilData);
 
-      alert('Council information updated successfully!');
-    } catch (error) {
-      console.error('Error updating council information:', error);
-      alert('Failed to update council information.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     alert('Council information updated successfully!');
+  //   } catch (error) {
+  //     console.error('Error updating council information:', error);
+  //     alert('Failed to update council information.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -95,7 +92,7 @@ export default function EditCouncilInfo() {
         />
         <TouchableOpacity 
           style={styles.signInButton} 
-          onPress={handleSave} 
+          onPress={{/*handleSave*/}} 
           disabled={loading}
         >
           {loading ? (

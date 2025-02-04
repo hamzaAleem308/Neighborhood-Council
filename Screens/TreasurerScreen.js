@@ -4,8 +4,9 @@ import WavyBackground from '../Background/WavyBackground';
 const screenWidth = Dimensions.get('window').width;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseURL from './Api'
+import { ScrollView } from 'react-native-gesture-handler';
 
-export default function CommitteMemberScreen ({ route, navigation }) {
+export default function TreasurerScreen ({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
   const {Council, councilName, councilDescription, role} = route.params;
   
@@ -143,7 +144,7 @@ export default function CommitteMemberScreen ({ route, navigation }) {
 
   useEffect(() => {
     fetchNotifications();
-  }, [Council, memberId]);
+  }, []);
 
   const handleReportProblemScreen = () => {
     navigation.navigate('ReportProblem', {councilId : Council, memberId : memberId})
@@ -307,6 +308,7 @@ export default function CommitteMemberScreen ({ route, navigation }) {
 
     {/* Buttons */}
     <View style={styles.buttonsContainer}>
+      <ScrollView>
       <TouchableOpacity style={styles.button} onPress={() =>  navigation.navigate('ReportProblem', {councilId : Council, memberId : memberId})}>
         <Image source={require('../assets/ReportProblem.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Report Issue</Text>
@@ -356,6 +358,10 @@ export default function CommitteMemberScreen ({ route, navigation }) {
       </Modal>
 
       </TouchableOpacity>
+      <TouchableOpacity style={styles.button}  onPress={() => {navigation.navigate('ManageContributions', {councilId : Council, memberId : memberId})}}>
+        <Image source={require('../assets/contribution.png')} style={styles.buttonIcon} />
+        <Text style={styles.buttonText}>Contributions</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate('Meeting', {councilId : Council, memberId : memberId})}}> 
         <Image source={require('../assets/meetings.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Meetings</Text>
@@ -368,6 +374,8 @@ export default function CommitteMemberScreen ({ route, navigation }) {
         <Image source={require('../assets/ViewIssues.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>View Problems</Text>
       </TouchableOpacity>
+
+      </ScrollView>
     </View>
     <Image
           source={require('../assets/Footer.png')}
@@ -415,6 +423,7 @@ buttonsContainer: {
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
+  top: 20,
   bottom: 20
 },
 button: {

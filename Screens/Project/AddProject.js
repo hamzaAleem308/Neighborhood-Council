@@ -1,25 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import WavyBackground from '../../Background/WavyBackground';
 import WavyBackground2 from '../../Background/WavyBackground2';
 import { Button } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import baseURL  from '../Api';
+import DatePicker from 'react-native-date-picker';
 
 
 export default function AddProject({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
-  const { councilId, memberID, problemId} = route.params;
+  const { councilId, memberID, problemId, Title, Description} = route.params;
   const [title, setTitle]= useState('');
   const [desc,  setDesc] = useState('');
   const [budget, setBudget] = useState('');
   const [loading, setLoading] = useState(false)
+  const [startDatePickerOpen, setStartDatePickerOpen] = useState(false);
+  const [endDatePickerOpen, setEndDatePickerOpen] = useState(false);
   const priorityList = [
     { label: 'High', value: 'High' },
     { label: 'Medium', value: 'Medium' },
     { label: 'Low', value: 'Low' },
   ]
+  const [sd, setSd] = useState(new Date());
+  const [ed, setEd] = useState(new Date());
+  const [sdData, setSdData] = useState('Start Date');
+  const [edData, setEdData] = useState('End Date');
   const [priority, setPriority] = useState('');
+
+  useEffect(() => {
+    if(Title){
+      setTitle(Title)
+    }
+    if(Description){
+      setDesc(Description)
+    }
+  }, [Title, Description])
 
   async function CreateCouncil() {
     if (!title || !desc || !budget || !priority) {
@@ -32,6 +48,8 @@ export default function AddProject({ route, navigation }) {
         description: desc,
         budget: budget,
         Priority: priority,
+        start_date: sd,
+        end_date: ed,
         problem_id: problemId? problemId : 0
     };
     setLoading(true)
@@ -72,13 +90,47 @@ export default function AddProject({ route, navigation }) {
             <Image source={require('../../assets/project.png')} style={styles.image}></Image>
           </View>
         </View>
-        <TextInput style={styles.input} placeholder="Title " keyboardType="default" onChangeText={setTitle} placeholderTextColor="#000" />
+        <TextInput style={styles.input} placeholder="Title " keyboardType="default" value={Title}  onChangeText={setTitle} placeholderTextColor="#000" />
         <TextInput style={styles.description} placeholder="Description" multiline={true}
         numberOfLines={5} 
+        value={Description} 
         selectionColor={'#f5d8a0'}
         textAlignVertical="top" 
         keyboardType="default"onChangeText={setDesc} placeholderTextColor="#000" />
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row',}}>
+        <TouchableOpacity style={styles.dobButton} onPress={() => setStartDatePickerOpen(true)}>
+                    <Text style={styles.signUpButtonText}>{sdData}</Text>
+                  </TouchableOpacity>
+                  <DatePicker
+                    modal
+                    open={startDatePickerOpen}
+                    date={sd}
+                    mode="date"
+                    onConfirm={(date) => {
+                      setStartDatePickerOpen(false);
+                      setSd(date);
+                      setSdData(date.toDateString());
+                    }}
+                    onCancel={() => setStartDatePickerOpen(false)}
+                  />
+                  {/* End Date Picker */}
+                  <TouchableOpacity style={styles.dobButton} onPress={() => setEndDatePickerOpen(true)}>
+                    <Text style={styles.signUpButtonText}>{edData}</Text>
+                  </TouchableOpacity>
+                  <DatePicker
+                    modal
+                    open={endDatePickerOpen}
+                    date={ed}
+                    mode="date"
+                    onConfirm={(date) => {
+                      setEndDatePickerOpen(false);
+                      setEd(date);
+                      setEdData(date.toDateString());
+                    }}
+                    onCancel={() => setEndDatePickerOpen(false)}
+                  />
+                  </View>
+        <View style={{flexDirection: 'row',}}>
         <TextInput style={styles.input2} placeholder="Set Budget" keyboardType="numeric" onChangeText={setBudget} placeholderTextColor="#000" />
         <Dropdown
           data={priorityList}
@@ -141,7 +193,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titleText: {
-    bottom : 70,
+    bottom : 40,
     color: 'black',
     margin: 10,
     fontSize: 30,
@@ -201,6 +253,27 @@ const styles = StyleSheet.create({
   signInButtonText: {
     color: '#000',
     fontWeight: 'bold',
+  },
+  signUpButton: {
+    width: '40%',
+    padding: 15,
+    borderRadius: 25,
+    backgroundColor: '#F0C38E',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  signUpButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  dobButton: {    
+    width: '42%',
+    padding: 15,
+    borderRadius: 25,
+    backgroundColor: '#F8F9FA',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginRight: 5
   },
   footer: {
     position: 'absolute',

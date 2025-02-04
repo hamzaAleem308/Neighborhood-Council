@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Text, Alert, SafeAreaView, TouchableOpacity, View, TextInput, StyleSheet, ImageBackground, Image, Dimensions, useWindowDimensions, KeyboardAvoidingView, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Text, Alert, SafeAreaView, TouchableOpacity, View, TextInput, StyleSheet, ImageBackground, Image, Dimensions, useWindowDimensions, KeyboardAvoidingView, ScrollView, ActivityIndicator, BackHandler } from 'react-native';
 import WavyBackground from '../../Background/WavyBackground';
 import  baseURL  from '../Api';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingScreen from '../LoadingScreen';
 import HomeScreen from '../Home';
@@ -18,6 +18,33 @@ export default function Login({}){
   const [showPassword, setShowPassword] = useState(false); 
   const [loading, setLoading] = useState(false);
   
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        Alert.alert(
+          'Confirm Exit',
+          'Are you sure you want to exit?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => null, // Do nothing
+              style: 'cancel',
+            },
+            {
+              text: 'Yes',
+              onPress: () => BackHandler.exitApp(), // Exit the app
+            },
+          ],
+          { cancelable: false } // Prevent dismissing the alert by tapping outside
+        );
+        return true; // Prevent the default back button behavior
+      };
+        BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+        // Cleanup the event listener on component unmount
+      return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+    }, [])
+  )
+
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {

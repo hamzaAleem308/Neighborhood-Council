@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Image, Modal, SafeAreaView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import WavyBackground from '../../Background/WavyBackground';
-import { FAB, Portal, Provider } from 'react-native-paper';
+import { FAB } from 'react-native-paper';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import baseURL from '../Api'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function ReportProblem ({route}) {
+export default function ComplaintDairyForPanel ({route}) {
   const { width } = useWindowDimensions(); // screen width
   const [pending, setPending] = useState(0);
   const [open, setOpen] = useState(0);
@@ -17,8 +17,7 @@ export default function ReportProblem ({route}) {
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
   const [preference, setPreference] = useState(null)
-  const [memberId, setMemberId] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
+  const [memberId, setMemberId] = useState(0)
   const navigation = useNavigation()
 
 
@@ -48,7 +47,7 @@ export default function ReportProblem ({route}) {
 const [allProblemsData, setAllProblemsData] = useState([])
   const getProblemStatusSummary = async() => {
     try{
-      const response = await fetch(`${baseURL}reportProblem/getProblemStatusSummary?memberId=${memberId}&councilId=${councilId}`)
+      const response = await fetch(`${baseURL}reportProblem/getProblemStatusSummaryForPanel?councilId=${councilId}&solverId=${memberId}`)
         if(response.ok){
             const json = await response.json()
             console.log('Status Summary Fetched Successfully!')
@@ -73,11 +72,11 @@ const [allProblemsData, setAllProblemsData] = useState([])
             });
             }
       else{
-        console.log('Failed to Fetch Status Summary')
+        Alert.alert('Failed to Fetch Status Summary')
       }
     }
     catch(error){
-      console.log('Error', 'Unable to Fetch Status Summary' + error)
+      Alert.alert('Error', 'Unable to Fetch Status Summary' + error)
     }
   }
 
@@ -99,7 +98,7 @@ const handlePress = () =>{
     <SafeAreaView style={styles.container}>
       <WavyBackground />
       {/* Complaints Diary Title */}
-      <Text style={styles.titleText}>Report your Problem!</Text>
+      <Text style={styles.titleText}>View Reported Problems</Text>
       <View style={{marginTop:200}}>
       <Text style={styles.header}>COMPLAINTS DIARY</Text>
       {/* Total Complaints */}
@@ -118,7 +117,7 @@ const handlePress = () =>{
         <Text style={styles.statusNumber}>{open}</Text>
       </View>
       ):(
-        <TouchableOpacity style={styles.statusBox} onPress={() => navigation.navigate('ViewReportedProblems', { councilId: councilId, problemStatus: 'Opened', memberId : memberId })}>
+        <TouchableOpacity style={styles.statusBox} onPress={() => navigation.navigate('ViewIssuesForPanel', { councilId: councilId, problemStatus: 'Opened', memberId : memberId })}>
         <Text style={styles.statusLabel}>OPEN</Text>
         <Text style={styles.statusNumber}>{open}</Text>
       </TouchableOpacity>
@@ -129,18 +128,18 @@ const handlePress = () =>{
           <Text style={styles.statusNumber}>{closed}</Text>
         </View>
         ):(
-        <TouchableOpacity style={styles.statusBox} onPress={() => navigation.navigate('ViewReportedProblems', { councilId: councilId, problemStatus: 'Closed', memberId : memberId })}>
+        <TouchableOpacity style={styles.statusBox} onPress={() => navigation.navigate('ViewIssuesForPanel', { councilId: councilId, problemStatus: 'Closed', memberId : memberId })}>
         <Text style={styles.statusLabel}>CLOSED</Text>
         <Text style={styles.statusNumber}>{closed}</Text>
       </TouchableOpacity>
-      )} 
+      )}
         {pending == 0? (
         <View style={styles.statusBox2 } >
           <Text style={styles.statusLabel}>PENDING</Text>
           <Text style={styles.statusNumber}>{pending}</Text>
         </View>
         ):(
-        <TouchableOpacity style={styles.statusBox} onPress={() => navigation.navigate('ViewReportedProblems', { councilId: councilId, problemStatus: 'Pending', memberId : memberId })}>
+        <TouchableOpacity style={styles.statusBox} onPress={() => navigation.navigate('ViewIssuesForPanel', { councilId: councilId, problemStatus: 'Pending', memberId : memberId })}>
         <Text style={styles.statusLabel}>PENDING</Text>
         <Text style={styles.statusNumber}>{pending}</Text>
       </TouchableOpacity>
@@ -153,37 +152,12 @@ const handlePress = () =>{
         color="#F0C38E"
         onPress={openMenu}
       /> */}
-      <Provider>
-      <View style={{flex: 1}}>
-      <Portal>
-          <FAB.Group
-            open={isOpen}
-            icon={isOpen ? 'close' : 'plus'} // Changes from "+" to "x" when open
-            backgroundColor="#F0C38E"
-            actions={[
-              {
-                icon: 'pencil',
-                label: 'Report Problem',
-                onPress: openMenu,
-                labelStyle: { color: 'black' }, // Change the label color
-                color: 'white', // Change the icon color
-              },
-            ]}
-            onStateChange={({ open }) => setIsOpen(open)}
-            fabStyle={styles.fab}
-            backdropColor="transparent" // Removes the black background
-            style={styles.fabGroup}
-            color="#F0C38E"
-          />
-        </Portal>
-        </View>
-        </Provider>
         <Modal
-        visible={menuVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={closeMenu}
-      >
+  visible={menuVisible}
+  transparent={true}
+  animationType="fade"
+  onRequestClose={closeMenu}
+>
   <TouchableOpacity style={styles.modalOverlay} onPress={closeMenu}>
     <View style={styles.menuContainer}>
       {/* Modal Header with Close Button */}
@@ -241,12 +215,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF', // Set the background color to white
   },
   fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 90,
     backgroundColor: '#555',
-  },
-  fabGroup: {
-    position: 'absolute', // Ensures it doesn’t affect surrounding layout
-    right: 10,
-    bottom: 80,
   },
   footerContainer: {
     position: 'absolute',
@@ -302,7 +274,7 @@ const styles = StyleSheet.create({
     width: '27%',
     alignItems: 'flex-end',
   },
-  statusBox2: {
+   statusBox2: {
     backgroundColor: '#999',
     padding: 20,
     borderRadius: 10,

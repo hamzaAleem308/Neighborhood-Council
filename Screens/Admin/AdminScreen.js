@@ -11,8 +11,8 @@ export default function AdminScreen ({ route }) {
   const navigation = useNavigation();
   const [councilData , setCouncilData] = useState({});
   const [membersCount, setMembersCount] = useState(0);
+  const { Council, role} = route.params;
 
-  const { Council } = route.params;
   const getCouncilData = async () => {
     try {
       const response = await fetch(`${baseURL}Council/GetCouncil?councilId=${Council}`);
@@ -99,10 +99,8 @@ export default function AdminScreen ({ route }) {
 
 return (
   <SafeAreaView style={styles.container}>
-  
     <WavyBackground2/>
     <Text style={styles.name}>{councilData?.Name || 'Loading...'}</Text>
-
     <Text style={styles.memberCount}>Members: {membersCount}</Text>
     {/* Invite Resident */}
     <View style={styles.iconRow}>
@@ -132,7 +130,7 @@ return (
   <Text style={styles.desc}>Description: {councilData?.Description || 'Loading...'}</Text>
   <DividerLine />
 
-  <TouchableOpacity style={styles.signInButton} onPress={() => navigation.navigate('EditCouncilInfo', { councilId: Council })}>
+  <TouchableOpacity style={styles.signInButton} onPress={() => navigation.navigate('EditCouncilInfo', { councilId: Council, Name: councilData?.Name, Desc: councilData?.Description })}>
     <Text style={styles.signInButtonText}>Edit Community Info</Text>
   </TouchableOpacity>
   <TouchableOpacity style={styles.signInButton} onPress={() => navigation.navigate('ManageMembers', { councilId: Council })}>
@@ -141,7 +139,7 @@ return (
   <TouchableOpacity style={styles.signInButton} onPress={() => {navigation.navigate('Meeting', {councilId : Council, memberId : memberId})}}>
     <Text style={styles.signInButtonText}>Meetings</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.signInButton} onPress={() => {navigation.navigate('ViewIssues', {councilId : Council, memberId : memberId})}}>
+  <TouchableOpacity style={styles.signInButton} onPress={() => {navigation.navigate('ViewIssues', {role , councilId : Council, memberId : memberId})}}>
     <Text style={styles.signInButtonText}>Complaints</Text>
   </TouchableOpacity>
 

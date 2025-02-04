@@ -29,7 +29,7 @@ export default function JoinCouncil ({route, navigation}) {
         Alert.alert('Council added successfully!', 'Now you will be redirected to Home.', 
           [{ text: 'OK', onPress: () => navigation.navigate('HomeScreen', { member: memberID })}]);
       } 
-      else if( response.status == 204) {
+      else if( response.status == 403) {
         Alert.alert('No Council Found with this Join Code')
       } 
       else if( response.status == 409) {

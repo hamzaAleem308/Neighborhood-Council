@@ -7,30 +7,32 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Picker } from '@react-native-picker/picker';
 
-export default function ViewIssues({ navigation, route }) {
+export default function ViewIssuesForPanel({ navigation, route }) {
   const { width } = useWindowDimensions(); // screen width
   const { role, councilId, problemStatus } = route.params;
   const [problemData, setProblemData] = useState([]);
   const [memberId, setMemberId] = useState(0);
-   const [selectedId, setSelectedId] = useState(0)
-    const [menuVisible, setMenuVisible] = useState(false);
-    const openMenu = (id) => {
-      console.log('Opening menu for meeting:', id);
-      setSelectedId(id); 
-      setMenuVisible(true); 
-    };
-  
-    const closeMenu = () => {
-      console.log('Closing menu');
-      setSelectedId(null); 
-      setMenuVisible(false); 
-    };
-  const [comment, setComment] = useState('');
-  const [status, setStatus] = useState('');
   const [membersName, setMembersName] = useState([]);
   const [solverIds, setSolverIds] = useState({}); // Store solverId per problem
   const [memberData, setMemberData] = useState([]);
 
+  const [selectedId, setSelectedId] = useState(0)
+  const [menuVisible, setMenuVisible] = useState(false);
+  const openMenu = (id) => {
+        console.log('Opening menu for meeting:', id);
+        setSelectedId(id); 
+        setMenuVisible(true); 
+      };
+    
+  const closeMenu = () => {
+        console.log('Closing menu');
+        setSelectedId(null); 
+        setMenuVisible(false); 
+      };
+  const [comment, setComment] = useState('');
+  const [status, setStatus] = useState('');
+
+  
 const handleSolverChange = async(problemId, selectedSolverId) => {
   try{
     const response = await fetch(`${baseURL}ReportProblem/AssignProblemToPanelMember?councilId=${councilId}&solverId=${selectedSolverId}&problemId=${problemId}`,
@@ -108,7 +110,7 @@ const getMemberName = async (memberId) => {
 
   const getReportedProblem = async () => {
     try {
-      const response = await fetch(`${baseURL}ReportProblem/GetReportedProblemForChairman?councilId=${councilId}&status=${problemStatus}`);
+      const response = await fetch(`${baseURL}ReportProblem/GetReportedProblemForPanel?councilId=${councilId}&solverId=${memberId}&&status=${problemStatus}`);
       if (response.ok) {
         const data = await response.json(); // Await the JSON parsing
         if (data && data.length > 0) {
@@ -149,42 +151,42 @@ const getMemberName = async (memberId) => {
     }
   };
 
-  useEffect(() => {
-    getMembersName();
-  }, [councilId])
+//   useEffect(() => {
+//     getMembersName();
+//   }, [councilId])
   
-const getMembersName = async () => {
-  try {
-    console.log('Loading Members Name..')
-    const response = await fetch(`${baseURL}reportProblem/GetCouncilMembersForAssigning?councilId=${councilId}`);
+// const getMembersName = async () => {
+//   try {
+//     console.log('Loading Members Name..')
+//     const response = await fetch(`${baseURL}reportProblem/GetCouncilMembersForAssigning?councilId=${councilId}`);
    
-    if (response.ok) {
-      console.log('Members Name Response' + response)
-      const responseText = await response.text(); 
-      console.log('Members Name Loaded!')
-      if (responseText) {
-        const data = JSON.parse(responseText); 
-        // Format data for the dropdown
-        if (data && data.length > 0) {
-          console.log('Members Name' + data)
-        const MembersData = data.map((member) => ({
-          label: member.MembersName, // Display name
-          value: member.MembersId,   // Member id
-          role: member.MemberRole
-          }))
-        setMembersName(MembersData);
-        }
-        else{
-          setMembersName([])  
-        }
-      }
-    } else {
-      Alert.alert('Failed to fetch members: ' + response.status);
-    }
-  } catch (error) {
-    console.error('Failed to Load Data: ' + error);
-  }
-};
+//     if (response.ok) {
+//       console.log('Members Name Response' + response)
+//       const responseText = await response.text(); 
+//       console.log('Members Name Loaded!')
+//       if (responseText) {
+//         const data = JSON.parse(responseText); 
+//         // Format data for the dropdown
+//         if (data && data.length > 0) {
+//           console.log('Members Name' + data)
+//         const MembersData = data.map((member) => ({
+//           label: member.MembersName, // Display name
+//           value: member.MembersId,   // Member id
+//           role: member.MemberRole
+//           }))
+//         setMembersName(MembersData);
+//         }
+//         else{
+//           setMembersName([])  
+//         }
+//       }
+//     } else {
+//       Alert.alert('Failed to fetch members: ' + response.status);
+//     }
+//   } catch (error) {
+//     console.error('Failed to Load Data: ' + error);
+//   }
+// };
 
 
   const setProblemStatusToOpen = async(problemId) => {
@@ -226,8 +228,7 @@ const getMembersName = async () => {
       console.log('Unable to change status of Reported Problem', error);
     }
   }
-
-  const submitSolverComment = async (problemId) => {
+const submitSolverComment = async (problemId) => {
     if (!comment.trim() || !status) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
@@ -267,10 +268,10 @@ const getMembersName = async () => {
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('ViewProblemProgress',{problemId: item.ProblemId, problemStatus: item.Status, councilId: councilId, memberId: memberId})}>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>{item.Title || 'No Title'}</Text>
-        <Text style={styles.status(item.Status)}>{item.Status || 'NO Status'}</Text>
+        <Text style={styles.title}>{item.Title}</Text>
+        <Text style={styles.status(item.Status)}>{item.Status}</Text>
       </View>
-      <Text style={styles.description}>{item.Description || 'No Description'}</Text>
+      <Text style={styles.description}>{item.Description}</Text>
       {item.VisualEvidence ? (
         <Image
         source={{ uri: `${baseImageURL}${item.VisualEvidence}` }} // Construct full URL
@@ -281,63 +282,37 @@ const getMembersName = async () => {
         <Text style={styles.noImageText}>No Visual Evidence</Text>
       )}
       <View style={styles.metaContainer}>
-        <Text style={styles.metaText}>Type: {item.ProblemType || 'No Type'}</Text>
-        <Text style={styles.metaText}>Category: {item.Category || 'No Category'}</Text>
+        <Text style={styles.metaText}>Type: {item.ProblemType}</Text>
+        <Text style={styles.metaText}>Category: {item.Category}</Text>
       </View>
-      {!item.SolverId? (<View style={styles.buttonContainer2}>
-        {item.Status === 'Pending' && (
-         <>
-          <Text style={[styles.metaText,{marginBottom: 2, marginLeft: 8}]}>Assign Someone to Solve this? </Text>
-          <Dropdown
-          data={membersName}
-          style={styles.dropDown}
-          maxHeight={200}
-          labelField="label"   
-          valueField="value"   
-          placeholderTextColor = '#000'
-          placeholder="Select Panel Member"
-          value={solverIds[item.ProblemId] || null} // Retrieve solverId for this problem
-          onChange={(selectedItem) => {
-            handleSolverChange(item.ProblemId, selectedItem.value); // Update state for this problem
-          }}
-          renderPlaceholder={() => (
-            <Text style={{ color: '#333' }}>Select Panel Member</Text>
-        )}
-          renderItem={(item) => (
-            <ScrollView>
-              <Text style={{ color: 'black', fontSize: 15, padding: 15 }}>{item.label}  ⁓{item.role}</Text>
-            </ScrollView>
-          )}
-          /> 
-           <View style={styles.orContainer}>
-        <Text style={styles.orText}>OR</Text>
-      </View>
-          {/* <Text style={[styles.metaText,{alignItems: 'center', width: '100%', justifyContent: 'center', marginVertical: 5}]}>OR</Text> */}
+      
+      <Text style={[styles.metaText, {fontSize: 16, marginTop: 10, fontWeight: 500}]}>Problem is being Assigned to you</Text>
+      {item.Status === 'Pending' && (
           <TouchableOpacity
-            style={[styles.button2, styles.tickButton]}
+            style={[styles.button2, styles.tickButton, {marginTop: 5}]}
             onPress={() => setProblemStatusToOpen(item.ProblemId)}
           >
             <Text style={styles.buttonText}>Open</Text>
           </TouchableOpacity>
-          </>
         )}
+
         {item.Status === 'Opened' && (
           <View style = {{flex : 1, flexDirection : 'row', }}>
             {/*Add Working Button */}
              <TouchableOpacity
-          style={[styles.button, styles.tickButton]}
+          style={[styles.button, styles.tickButton, {marginTop: 5}]}
           onPress={() => {openMenu(item.ProblemId)}} // Pass the problem ID
         >
           <Text style={styles.buttonText}>Add Working Updates!</Text>
         </TouchableOpacity>
         {/*Close Button */}
-        <TouchableOpacity
-            style={[styles.button, styles.crossButton]}
-            onPress={() => setProblemStatusToClose(item.ProblemId)}
-          >
-            <Text style={styles.closeButtonText}>❌ Close</Text>
+          <TouchableOpacity
+                    style={[styles.button, styles.crossButton]}
+                    onPress={() => setProblemStatusToClose(item.ProblemId)}
+                  >
+              <Text style={styles.closeButtonText}>❌ Close</Text>
           </TouchableOpacity>
-          {/*Modal for Adding Project Update*/}
+        {/*Modal for Adding Project Update*/}
         <Modal
         visible={menuVisible && selectedId === item.ProblemId}
         transparent={true}
@@ -391,8 +366,52 @@ const getMembersName = async () => {
           </View>
         </TouchableOpacity>
       </Modal>
-
-          {/* <TouchableOpacity
+         </View>
+                )}
+              {/* </View>):(
+                <Text style={[styles.metaText, {fontSize: 16, marginTop: 10, fontWeight: 500}]}>Problem is Assigned to {item.SolverId} ⁓{item.SolverRole}</Text>
+              )} */}
+      {/* ///////////////////////////////////////////  Buttons//////////////////////////////////////
+      {!item.SolverId? (<View style={styles.buttonContainer2}>
+        {item.Status === 'Pending' && (
+         <>
+          <Text style={[styles.metaText,{marginBottom: 2, marginLeft: 8}]}>Assign Someone to Solve this? </Text>
+          <Dropdown
+          data={membersName}
+          style={styles.dropDown}
+          maxHeight={200}
+          labelField="label"   
+          valueField="value"   
+          placeholderTextColor = '#000'
+          placeholder="Select Panel Member"
+          value={solverIds[item.ProblemId] || null} // Retrieve solverId for this problem
+          onChange={(selectedItem) => {
+            handleSolverChange(item.ProblemId, selectedItem.value); // Update state for this problem
+          }}
+          renderPlaceholder={() => (
+            <Text style={{ color: '#333' }}>Select Panel Member</Text>
+        )}
+          renderItem={(item) => (
+            <ScrollView>
+              <Text style={{ color: 'black', fontSize: 15, padding: 15 }}>{item.label}  ⁓{item.role}</Text>
+            </ScrollView>
+          )}
+          /> 
+           <View style={styles.orContainer}>
+        <Text style={styles.orText}>OR</Text>
+      </View>
+          {/* <Text style={[styles.metaText,{alignItems: 'center', width: '100%', justifyContent: 'center', marginVertical: 5}]}>OR</Text> 
+          <TouchableOpacity
+            style={[styles.button2, styles.tickButton]}
+            onPress={() => setProblemStatusToOpen(item.ProblemId)}
+          >
+            <Text style={styles.buttonText}>Open</Text>
+          </TouchableOpacity>
+          </>
+        )}
+        {item.Status === 'Opened' && (
+          <View style = {{flex : 1, flexDirection : 'row', }}>
+          <TouchableOpacity
           style={[styles.button, styles.tickButton]}
           onPress={() => navigation.navigate('ScheduleMeeting',{Title: item.Title, Description: item.Description, problemId: item.ProblemId , councilId: councilId, memberId: memberId})}
         >
@@ -409,13 +428,13 @@ const getMembersName = async () => {
             onPress={() => setProblemStatusToClose(item.ProblemId)}
           >
             <Text style={styles.closeButtonText}>❌ Close</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
-        )}
-      </View>):(
+        )} */}
+      {/* </View>):(
         <Text style={[styles.metaText, {fontSize: 16, marginTop: 10, fontWeight: 500}]}>Problem is Assigned to {item.SolverId} ⁓{item.SolverRole}</Text>
-      )}
-      
+      )}*/}
+
     </TouchableOpacity>
   );
 // For Open button text
@@ -433,7 +452,6 @@ const getMembersName = async () => {
         contentContainerStyle={styles.flatListContent}
         showsVerticalScrollIndicator={false}
       />
-      
       </View>
       {/* <View style={styles.footerContainer}>
         <Image
@@ -610,7 +628,7 @@ const styles = StyleSheet.create({
   closeButtonText: { fontSize: 16, color: "#000" },
   modalContent: { marginBottom: 10 },
   label: { fontSize: 16, color: "black", marginBottom: 5 },
-  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, padding: 10, height: 100, textAlignVertical: "top", marginBottom: 10 },
+  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, padding: 10, height: 100, textAlignVertical: "top", marginBottom: 10, color: 'black' },
   picker: { color: "black", height: 50, width: "100%", marginBottom: 20 },
   submitButton: { backgroundColor: "#f5d8a0", padding: 10, borderRadius: 5, alignItems: "center" },
   submitButtonText: { color: "black", fontWeight: "bold", fontSize: 16 },

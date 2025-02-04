@@ -22,8 +22,38 @@ export default function SubmitReport({ route, navigation }) {
     { label: 'Sanitation', value: 'Sanitation' },
     { label: 'House Conflict', value: 'House Conflict' },
     { label: 'Neighboring Matters', value: 'Neighboring Matters' },
+    { label: 'Theft', value: 'Theft' },
+    { label: 'Robbery', value: 'Robbery' },
+    { label: 'Noise Disturbance', value: 'Noise Disturbance' },
+    { label: 'Illegal Parking', value: 'Illegal Parking' },
+    { label: 'Pet Complaints', value: 'Pet Complaints' },
+    { label: 'Traffic Issues', value: 'Traffic Issues' },
+    { label: 'Street Lighting', value: 'Street Lighting' },
+    { label: 'Vandalism', value: 'Vandalism' },
+    { label: 'Drug-Related Activity', value: 'Drug-Related Activity' },
+    { label: 'Domestic Disputes', value: 'Domestic Disputes' },
+    { label: 'Trespassing', value: 'Trespassing' },
+    { label: 'Loitering', value: 'Loitering' },
+    { label: 'Garbage Disposal', value: 'Garbage Disposal' },
+    { label: 'Water Leakage', value: 'Water Leakage' },
+    { label: 'Electricity Issues', value: 'Electricity Issues' },
+    { label: 'Blocked Drainage', value: 'Blocked Drainage' },
+    { label: 'Harassment', value: 'Harassment' },
+    { label: 'Security Concerns', value: 'Security Concerns' },
+    { label: 'Community Disputes', value: 'Community Disputes' },
+    { label: 'Public Nuisance', value: 'Public Nuisance' },
+    { label: 'Fire Safety Issues', value: 'Fire Safety Issues' },
+    { label: 'Road Maintenance', value: 'Road Maintenance' },
+    { label: 'Environmental Issues', value: 'Environmental Issues' },
+    { label: 'Flooding', value: 'Flooding' },
+    { label: 'Wildlife Encounters', value: 'Wildlife Encounters' },
+    { label: 'Abandoned Vehicles', value: 'Abandoned Vehicles' },
+    { label: 'Unregistered Businesses', value: 'Unregistered Businesses' },
+    { label: 'Violation of Rules', value: 'Violation of Rules' },
+    { label: 'Graffiti', value: 'Graffiti' },
     { label: 'Other', value: 'Other' },
   ];
+  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -49,25 +79,60 @@ export default function SubmitReport({ route, navigation }) {
   };
 
   const selectImage = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        maxWidth: 800,
-        maxHeight: 800,
-        quality: 0.7,
-      },
-      (response) => {
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-        } else if (response.errorMessage) {
-          console.error('Image Picker Error:', response.errorMessage);
-        } else if (response.assets && response.assets.length > 0) {
-          setVisualEvidence(response.assets[0].uri);
-          setSelectedImage(response.assets[0])
-          console.log(visualEvidence) 
-        }
-      }
+    Alert.alert(
+      'Choose Option',
+      'Select image from gallery or capture using camera',
+      [
+        {
+          text: 'Gallery',
+          onPress: () => {
+            launchImageLibrary(
+              {
+                mediaType: 'photo',
+                maxWidth: 800,
+                maxHeight: 800,
+                quality: 0.7,
+              },
+              (response) => {
+                handleImagePickerResponse(response);
+              }
+            );
+          },
+        },
+        {
+          text: 'Camera',
+          onPress: () => {
+            launchCamera(
+              {
+                mediaType: 'photo',
+                maxWidth: 800,
+                maxHeight: 800,
+                quality: 0.7,
+              },
+              (response) => {
+                handleImagePickerResponse(response);
+              }
+            );
+          },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
     );
+  };
+  
+  const handleImagePickerResponse = (response) => {
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+    } else if (response.errorMessage) {
+      console.error('Image Picker Error:', response.errorMessage);
+    } else if (response.assets && response.assets.length > 0) {
+      setVisualEvidence(response.assets[0].uri);
+      setSelectedImage(response.assets[0]);
+      console.log('Selected Image URI:', response.assets[0].uri);
+    }
   };
 
   const reportProblem = async () => {
@@ -167,7 +232,7 @@ export default function SubmitReport({ route, navigation }) {
           {loading ? (
             <ActivityIndicator size="small" color="#000" />
           ) : (
-            <Text style={styles.signInButtonText}>Report!</Text>
+            <Text style={styles.signInButtonText}>Report Issue!</Text>
           )}
         </TouchableOpacity>
       </View>

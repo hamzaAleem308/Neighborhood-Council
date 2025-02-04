@@ -84,7 +84,7 @@ export default function ViewNominations ({route, navigation}) {
       <WavyBackground2 />
      <View style={styles.cont}>
            <Text style={styles.titleText}>View Nominations</Text>
-           <Text style={{color : 'gray', marginBottom: 50}}>⨀ Panel Members are Nominated for Councilor Position</Text>
+           <Text style={{color : 'gray', marginBottom: 50}}>⨀ Panel Members are Nominated for their Positions</Text>
            <FlatList
                 style={{marginTop:5, marginBottom : 70}}
                 data={selectedCandidates}

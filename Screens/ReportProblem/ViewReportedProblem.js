@@ -4,10 +4,11 @@ import WavyBackground from '../../Background/WavyBackground';
 import baseURL from '../Api';
 import { baseImageURL } from '../Api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ViewReportedProblems({ navigation, route }) {
   const { width } = useWindowDimensions(); // screen width
-  const { councilId } = route.params;
+  const { councilId, problemStatus } = route.params;
   const [problemData, setProblemData] = useState([]);
   const [memberId, setMemberId] = useState(0);
 
@@ -38,7 +39,7 @@ export default function ViewReportedProblems({ navigation, route }) {
 
   const getReportedProblem = async () => {
     try {
-      const response = await fetch(`${baseURL}ReportProblem/GetReportedProblems?councilId=${councilId}&memberId=${memberId}`);
+      const response = await fetch(`${baseURL}ReportProblem/GetReportedProblemByStatus?councilId=${councilId}&memberId=${memberId}&status=${problemStatus}`);
       if (response.ok) {
         const data = await response.json(); // Await the JSON parsing
         if (data && data.length > 0) {
@@ -78,56 +79,60 @@ export default function ViewReportedProblems({ navigation, route }) {
   };
   
 
-  const setProblemStatusToOpen = async(problemId) => {
-    try{
-      const response = await fetch(`${baseURL}ReportProblem/SetStatusToOpen?problemId=${problemId}`,
-        {method : 'POST',  
-          headers: {
-          'Content-Type': 'application/json',
-        }})
-      if(response.ok){
-          console.log(`Status Set to Opened for ${problemId}`)
-          getReportedProblem();
-      }
-      else{
-        console.log('Failed to Change Status to Open')
-      }
-    }
-    catch{
-      console.log('Unable to change status of Reported Problem', error);
-    }
-  }
+  // const setProblemStatusToOpen = async(problemId) => {
+  //   try{
+  //     const response = await fetch(`${baseURL}ReportProblem/SetStatusToOpen?problemId=${problemId}`,
+  //       {method : 'POST',  
+  //         headers: {
+  //         'Content-Type': 'application/json',
+  //       }})
+  //     if(response.ok){
+  //         console.log(`Status Set to Opened for ${problemId}`)
+  //         getReportedProblem();
+  //     }
+  //     else{
+  //       console.log('Failed to Change Status to Open')
+  //     }
+  //   }
+  //   catch{
+  //     console.log('Unable to change status of Reported Problem', error);
+  //   }
+  // }
 
-  const setProblemStatusToClose = async(problemId) => {
-    try{
-      const response = await fetch(`${baseURL}ReportProblem/SetStatusToClose?problemId=${problemId}`,
-        {method : 'POST',  
-          headers: {
-          'Content-Type': 'application/json',
-        }})
-      if(response.ok){
-          console.log(`Status Set to Closed for ${problemId}`)
-          getReportedProblem();
-      }
-      else{
-        console.log('Failed to Change Status to Close')
-      }
-    }
-    catch{
-      console.log('Unable to change status of Reported Problem', error);
-    }
-  }
+  // const setProblemStatusToClose = async(problemId) => {
+  //   try{
+  //     const response = await fetch(`${baseURL}ReportProblem/SetStatusToClose?problemId=${problemId}`,
+  //       {method : 'POST',  
+  //         headers: {
+  //         'Content-Type': 'application/json',
+  //       }})
+  //     if(response.ok){
+  //         console.log(`Status Set to Closed for ${problemId}`)
+  //         getReportedProblem();
+  //     }
+  //     else{
+  //       console.log('Failed to Change Status to Close')
+  //     }
+  //   }
+  //   catch{
+  //     console.log('Unable to change status of Reported Problem', error);
+  //   }
+  // }
 
-  useEffect(() => {
-    getReportedProblem();
-  }, []);
-
+  // useEffect(() => {
+  //   getReportedProblem();
+  // }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      getReportedProblem();
+    }, [councilId, memberId])
+  )
 
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('ViewProblemProgress',{problemId: item.ProblemId, problemStatus: item.Status, councilId: councilId, memberId: memberId})}>
       <View style={styles.headerContainer}>
         <Text style={styles.title}>{item.Title}</Text>
-        {/* <Text style={styles.status(item.Status)}>{item.Status}</Text> */}
+        <Text style={styles.status(item.Status)}>{item.Status}</Text>
       </View>
       <Text style={styles.description}>{item.Description}</Text>
       {item.VisualEvidence ? (
@@ -143,12 +148,26 @@ export default function ViewReportedProblems({ navigation, route }) {
         <Text style={styles.metaText}>Type: {item.ProblemType}</Text>
         <Text style={styles.metaText}>Category: {item.Category}</Text>
       </View>
+
+      {/* ///////////////////////////////   Click to View Progess buttons ///////////////////////////// */}
+      
+      {/* {item.Status === 'Opened' && (
       <TouchableOpacity
             style={[styles.button, styles.tickButton]} 
             onPress={() => navigation.navigate('ViewProblemProgress',{problemId: item.ProblemId, problemStatus: item.Status, councilId: councilId, memberId: memberId})}
           >
             <Text style={styles.buttonText}>Click to View Progress!</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>)}
+      {item.Status === 'Closed' && (
+      <TouchableOpacity
+            style={[styles.button, styles.tickButton]} 
+            onPress={() => navigation.navigate('ViewProblemProgress',{problemId: item.ProblemId, problemStatus: item.Status, councilId: councilId, memberId: memberId})}
+          >
+            <Text style={styles.buttonText}>Click to View Progress!</Text>
+          </TouchableOpacity>)} */}
+
+          {/* ///////////////////////////////   Click to View Progess buttons ///////////////////////////// */}
+
       {/* <View style={styles.buttonContainer}>
         {item.Status === 'Pending' && (
           <TouchableOpacity
@@ -181,7 +200,7 @@ export default function ViewReportedProblems({ navigation, route }) {
         </View>
         )}
       </View> */}
-    </View>
+    </TouchableOpacity>
   );
 // For Open button text
 //Start Now, take action, get Started, Fix It, Solve It
@@ -258,8 +277,8 @@ const styles = StyleSheet.create({
   status: (status) => ({
     fontSize: 14,
     fontWeight: '600',
-    color: status === 'Pending' ? '#F59E0B' : status === 'Opened' ? '#10B981' : status === 'Closed' ? '#EF4444' : '#000',
-    backgroundColor: status === 'Pending' ? '#FEF3C7' : status === 'Opened' ? '#D1FAE5' : status === 'Closed' ? '#FEE2E2': '#FFF',
+    color: status === 'Pending' ? '#F59E0B' : status === 'Opened' ? '#10B981' : status === 'Closed' ? '#EF4444': status === 'Completed' ? '#000' : '#000' ,
+    backgroundColor: status === 'Pending' ? '#FEF3C7' : status === 'Opened' ? '#D1FAE5' : status === 'Closed' ? '#FEE2E2': status === 'Completed' ? '#ccd0db' : '#FFF',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,

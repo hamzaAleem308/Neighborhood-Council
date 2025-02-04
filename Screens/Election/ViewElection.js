@@ -148,18 +148,38 @@ const getElectionAlongNominations = async () => {
 //   const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
 //   return new Date(dateString).toISOString(undefined, options);
 // };
+// const formatDate = (dateString) => {
+//   const formatter = new Intl.DateTimeFormat('en-US', {
+//     year: 'numeric',
+//     month: 'short',
+//     day: '2-digit',
+//   });
+//   return formatter.format(new Date(dateString));
+// };
+
 const formatDate = (dateString) => {
   const formatter = new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-  });
-  return formatter.format(new Date(dateString));
-};
-
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: true, // Use 12-hour format; set to false for 24-hour format
+});
+return formatter.format(new Date(dateString));
+}
 
 const triggerElection = () => {
-  const currentDate = new Date().toISOString();
+  const currentDate = new Date().toISOString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true, // Use 12-hour format; set to false for 24-hour format
+  });
   const startDate = sDate;
   const endDate = eDate;
   const now = formatDate(currentDate);
@@ -280,12 +300,12 @@ useEffect(() => {
     setLoading(false)
   };
 
-const formatTime = (milliseconds) => {
-  const hours = Math.floor((milliseconds / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((milliseconds / (1000 * 60)) % 60);
-  const seconds = Math.floor((milliseconds / 1000) % 60);
-  return `${hours}h : ${minutes}m : ${seconds}s`;
-};
+// const formatTime = (milliseconds) => {
+//   const hours = Math.floor((milliseconds / (1000 * 60 * 60)) % 24);
+//   const minutes = Math.floor((milliseconds / (1000 * 60)) % 60);
+//   const seconds = Math.floor((milliseconds / 1000) % 60);
+//   return `${hours}h : ${minutes}m : ${seconds}s`;
+// };
 
 const renderItemForElection = ({ item }) => (
   <View style={styles.card}>
@@ -346,12 +366,12 @@ const chartData = {
        {/* Check if nominations exist for election */}
     {isElectionFound ? (
       <View style={styles.cont}>
-        <Text style={styles.titleText}>Start the Election</Text>
+        <Text style={styles.titleText}>Election Initiated</Text>
         <FlatList
           data={electionData}
           renderItem={renderItemForElection}
           keyExtractor={(item) => item.ElectionId.toString()}
-          contentContainerStyle={styles.cont}
+          contentContainerStyle={{ marginTop: 50 }}
           ListEmptyComponent={() => (
             <Text style={{ color: 'black' }}>No Election Found</Text>
           )}
@@ -360,7 +380,7 @@ const chartData = {
       data={panelData}
       renderItem={renderItemForPanel}
       keyExtractor={(item) => item.PanelId.toString()}
-      contentContainerStyle={styles.cont3}
+      contentContainerStyle={{}}
       ListEmptyComponent={() => (
         <Text style={{ color: 'black' }}>No Panel Found</Text>
       )}
@@ -378,7 +398,7 @@ const chartData = {
       </View>
     ): isActive? (
        <View style={styles.cont}>
-         <Text style={styles.titleText}>Close the Election</Text>
+         <Text style={styles.titleText}>Ongoing Election</Text>
          <View style={styles.card1}>
       <Text style={styles.title}>{activeElectionData.electionName}</Text>
       <Text style={styles.statusText}>Status: {activeElectionData?.status || 'No Election Found'}</Text>
@@ -450,13 +470,13 @@ const chartData = {
       <Text></Text>
     )}
 
-      <View style={styles.footerContainer}>
+      {/* <View style={styles.footerContainer}>
         <Image
           source={require('../../assets/Footer.png')}
           style={[styles.footer, { width: width }]} // image width to screen width
           resizeMode="stretch" // Maintain aspect ratio
         />
-      </View>
+      </View> */}
     </SafeAreaView>
   );
 };
@@ -471,8 +491,8 @@ const styles = StyleSheet.create({
   },
   titleText: {
     color: 'black',
-    top : 50,
-    marginBottom: 80,
+    top : 20,
+    marginBottom: 30,
     fontSize: 30,
     textAlign: 'center',
   },
@@ -515,7 +535,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5d8a0',
     borderRadius: 10,
     alignItems: 'center',
-    marginBottom : 100
+    marginBottom : 30
   },
   closeButton: {
     width: '60%',
@@ -524,7 +544,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
     borderRadius: 10,
     alignItems: 'center',
-    marginBottom : 100
+    marginBottom : 30
   },
   buttonText: {
     color: '#fff',
@@ -551,7 +571,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   electionName: {
-    marginTop : 20,
+    marginTop : 10,
     fontSize: 20,
     fontWeight: '600',
     color: '#333',
@@ -594,7 +614,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1, // Shadow transparency
     shadowRadius: 4, // Shadow blur
     elevation: 3, // Shadow for Android
-    bottom : 20
+    bottom : 0
     
   },
   panelContainer: {

@@ -38,17 +38,24 @@ export default function CouncilCard({ route, council, navigation, member, displa
       if (response.ok) {
         switch (role) {
           case 'Admin':
-            navigation.navigate('AdminScreen', {Council : council.id});
+            navigation.navigate('AdminScreen', {role, Council : council.id});
             break;
           case 'Member':
-            navigation.navigate('ResidentScreen' , {Council : council.id, councilName : council.Name, councilDescription: council.Description});
+            navigation.navigate('ResidentScreen' , {role, Council : council.id, councilName : council.Name, councilDescription: council.Description});
             break;
-          case 'Councilor':
-            navigation.navigate('CouncilorScreen' , {Council : council.id, councilName : council.Name, councilDescription: council.Description});
+          case 'Councillor':
+            navigation.navigate('CommitteeMemberScreen' , {role, Council : council.id, councilName : council.Name, councilDescription: council.Description});
             break;
           case 'Chairperson':
-            navigation.navigate('ChairmanScreen' , {Council : council.id, councilName : council.Name, councilDescription: council.Description});
+            navigation.navigate('ChairmanScreen' , {role, Council : council.id, councilName : council.Name, councilDescription: council.Description});
           break;
+          case 'Treasurer':
+            navigation.navigate('TreasurerScreen' , {role, Council : council.id, councilName : council.Name, councilDescription: council.Description});
+          break;
+          case 'Secratary':
+            navigation.navigate('SecrataryScreen' , {role, Council : council.id, councilName : council.Name, councilDescription: council.Description});
+          break;
+          
           default:
             Alert.alert('Error', 'Unknown role.');
         }
@@ -72,18 +79,12 @@ export default function CouncilCard({ route, council, navigation, member, displa
       <Card style={styles.card} onPress={checkUserType}>
         <View style={styles.cardContent}>
           {/* Display Picture on the left */}
-          {displayPicture ? (
+          {displayPicture && (
             <Image
               source={{ uri: `${baseImageURL}${displayPicture}` }}
               style={styles.displayPicture}
               resizeMode="cover"
             />
-          ): (
-            <Image
-            source={require('../assets/group.png')}
-            style={styles.displayPicture}
-            resizeMode="cover"
-          />
           )}
   
           {/* Council Info */}

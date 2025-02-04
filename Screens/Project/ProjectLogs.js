@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import WavyBackground from '../../Background/WavyBackground';
 import { useNavigation } from '@react-navigation/native';
 import DatePicker from 'react-native-date-picker';
 import { Dropdown } from 'react-native-element-dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function ProjectLogs() {
+export default function ProjectLogs({navigation, route}) {
   const { width } = useWindowDimensions();
-  const [projectId, setProjectId] = useState('');
+  const { projectId } = route.params;
   const [actionTaken, setActionTaken] = useState('');
   const [actionDate, setActionDate] = useState(new Date());
   const [status, setStatus] = useState(null);
@@ -17,7 +18,6 @@ export default function ProjectLogs() {
   const [loggedBy, setLoggedBy] = useState('');
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const navigation = useNavigation();
 
   const statusList = [
     { label: 'Pending', value: 'Pending' },
@@ -25,16 +25,41 @@ export default function ProjectLogs() {
     { label: 'Completed', value: 'Completed' },
   ];
 
+  const [memberId, setMemberId] = useState(null);
+    
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await getUserData();
+        if (userData && userData.memberId) {
+          setMemberId(userData.memberId);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+ fetchUserData()
+  }, []);
+
+    const getUserData = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('userData');
+        return jsonValue != null ? JSON.parse(jsonValue) : null;
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+  
   const saveProjectLog = async () => {
-    if (!projectId || !actionTaken || !status || !loggedBy) {
-      alert('Please fill in all required fields.');
-      return;
-    }
+    // if (!projectId || !actionTaken || !status || !loggedBy) {
+    //   alert('Please fill in all required fields.');
+    //   return;
+    // }
 
     setLoading(true);
 
     try {
-      const response = await fetch('YOUR_BACKEND_API_ENDPOINT', {
+      const response = await fetch(`${baseURL}Project/AddProjectLogsById?projectId=${projectId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +72,7 @@ export default function ProjectLogs() {
           comments: comments,
           amount_spent: parseFloat(amountSpent) || 0,
           feedback: feedback,
-          logged_by: loggedBy,
+          logged_by: memberId? memberId: 0,
         }),
       });
 
@@ -205,7 +230,7 @@ const styles = StyleSheet.create({
     width: '45%',
     borderRadius: 25,
     padding: 10,
-    borderRadius: 8,
+    marginLeft: 10,
     backgroundColor: '#F8F9FA',
     marginBottom: 15,
   },

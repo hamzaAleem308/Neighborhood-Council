@@ -79,6 +79,7 @@ export default function NominateCandidate({ route, navigation }){
           <Text style={{ textAlign: 'center', color: 'black', fontSize: 20 }}>
                No Elections Initiated or An Election is in progress.
               </Text>
+              
         )}
       </View>
         <Image

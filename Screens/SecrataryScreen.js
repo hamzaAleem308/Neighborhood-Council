@@ -5,7 +5,7 @@ const screenWidth = Dimensions.get('window').width;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseURL from './Api'
 
-export default function CommitteMemberScreen ({ route, navigation }) {
+export default function SecretaryScreen ({ route, navigation }) {
   const { width } = useWindowDimensions(); // screen width
   const {Council, councilName, councilDescription, role} = route.params;
   
@@ -143,7 +143,7 @@ export default function CommitteMemberScreen ({ route, navigation }) {
 
   useEffect(() => {
     fetchNotifications();
-  }, [Council, memberId]);
+  }, []);
 
   const handleReportProblemScreen = () => {
     navigation.navigate('ReportProblem', {councilId : Council, memberId : memberId})
@@ -307,7 +307,7 @@ export default function CommitteMemberScreen ({ route, navigation }) {
 
     {/* Buttons */}
     <View style={styles.buttonsContainer}>
-      <TouchableOpacity style={styles.button} onPress={() =>  navigation.navigate('ReportProblem', {councilId : Council, memberId : memberId})}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ReportProblem', {councilId : Council, memberId : memberId})}>
         <Image source={require('../assets/ReportProblem.png')} style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Report Issue</Text>
 

@@ -110,14 +110,22 @@ export default function ManageProjects({ route, navigation}) {
           priority={item.Priority}
           onChange={(newPriority) => updateProjectPriority(item.id, newPriority)}
         />
+
+      <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity
+            style={[styles.button, styles.tickButton]}
+            onPress={() => navigation.navigate('ScheduleMeeting',{projectId: item.id , councilId: councilID, memberId: memberID, Title: item.title, Description: item.description})}
+          >
+            <Text style={styles.buttonText}>Schedule Meeting!</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.tickButton]}
+            onPress={() => navigation.navigate('ProjectLogs',{projectId: item.id , councilId: councilID, memberId: memberID})}
+          >
+            <Text style={styles.buttonText}>Enter Project Updates!</Text>
+          </TouchableOpacity>
+          </View>
       </View>
-      
-      <TouchableOpacity
-      style={[styles.button, styles.tickButton]}
-      onPress={() => navigation.navigate('ScheduleMeeting',{projectId: item.id , councilId: councilID, memberId: memberID})}
-    >
-      <Text style={styles.buttonText}>Schedule Meeting!</Text>
-    </TouchableOpacity>
     </>
     );
   };
@@ -139,6 +147,7 @@ export default function ManageProjects({ route, navigation}) {
           keyExtractor={(item, index) => index.toString()}
           refreshing={loading}
           onRefresh={fetchProjects}
+          ListEmptyComponent={<Text style={{color: 'black', fontSize: 17}}>No Projects Found</Text>}
           initialScrollIndex={0} // Ensure it's set to a valid index
         />
       </View>
@@ -178,7 +187,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 16,
-    marginBottom: 10,
+    marginBottom: 5,
+    marginTop: 10,
     borderWidth: 1,
     borderColor: '#ddd',
     shadowColor: '#000',
@@ -207,7 +217,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: '3%', // Position the icon to the right inside the input
     justifyContent: 'center',
-    height: '190%',
+    height: '130%',
   },
   dropdownTextfoButton:{
     position: 'absolute',
@@ -242,15 +252,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     padding: 10,
   },
-  
   button: {
     flex: 1,
     paddingVertical: 12,
+    width: '50%',
     marginHorizontal: 5,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginTop: 5,
   },
   tickButton: {
     backgroundColor: '#f5d8a0',

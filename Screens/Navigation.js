@@ -113,6 +113,14 @@ import ProjectLogs from './Project/ProjectLogs';
 import EditCouncilInfo from './Admin/EditCouncilInfo';
 import ViewReportedProblems from './ReportProblem/ViewReportedProblem';
 import ViewProblemProgress from './ReportProblem/ViewProblemProgress';
+import SecretaryScreen from './SecrataryScreen';
+import TreasurerScreen from './TreasurerScreen';
+import ShowProjectLogs from './Project/ShowProjectLogs';
+import ComplaintDairyForChairman from './ReportProblem/ComplaintDiaryForChairman';
+import ComplaintDairyForPanel from './ReportProblem/ComplaintDiaryForPanel';
+import ViewIssuesForPanel from './ReportProblem/ViewIssuesForPanel';
+import ManageContributionsScreen from './Contributions/Contribution';
+import SwitchCouncil from './Council/SwitchCouncil';
 
 const Drawer = createDrawerNavigator();
 
@@ -265,6 +273,14 @@ export default function App() {
       <Stack.Screen name="EditCouncilInfo" component={EditCouncilInfo} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
       <Stack.Screen name="ViewReportedProblems" component={ViewReportedProblems} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
       <Stack.Screen name="ViewProblemProgress" component={ViewProblemProgress} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="SecrataryScreen" component={SecretaryScreen} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="TreasurerScreen" component={TreasurerScreen} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>   
+      <Stack.Screen name="ShowProjectLogs" component={ShowProjectLogs} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>  
+      <Stack.Screen name="ComplaintDiaryForChairman" component={ComplaintDairyForChairman} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>  
+      <Stack.Screen name="ComplaintDiaryForPanel" component={ComplaintDairyForPanel} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>  
+      <Stack.Screen name="ViewIssuesForPanel" component={ViewIssuesForPanel} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>  
+      <Stack.Screen name="ManageContributions" component={ManageContributionsScreen} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/> 
+      <Stack.Screen name="SwitchCouncil" component={SwitchCouncil} options={{headerTransparent: true, headerTitleAlign: 'center',  headerTitle: ''  }}/>
       </Stack.Navigator>
     </NavigationContainer>
     </GestureHandlerRootView>

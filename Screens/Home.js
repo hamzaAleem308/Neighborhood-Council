@@ -134,9 +134,9 @@
 
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Alert, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, Button, Modal, TouchableOpacity } from 'react-native';
+import { FlatList, Alert, Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View, Button, Modal, TouchableOpacity, BackHandler, TextInput } from 'react-native';
 import WavyBackground from '../Background/WavyBackground';
-import { FAB } from 'react-native-paper';
+import { FAB, Portal, Provider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CouncilCard from '../Cards/CouncilCard';
 import { useFocusEffect } from '@react-navigation/native';
@@ -149,11 +149,42 @@ export default function HomeScreen({ route, navigation }) {
  const { memberID } = route.params;
   const [memberId, setMemberId] = useState(null);
   const [open, setOpen] = useState(false);
-
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
 
   const openMenu = () => setMenuVisible(true);
   const closeMenu = () => setMenuVisible(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const handleBackPress = () => {
+        Alert.alert(
+          'Confirm Exit',
+          'Are you sure you want to exit?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => null, // Do nothing
+              style: 'cancel',
+            },
+            {
+              text: 'Yes',
+              onPress: () => BackHandler.exitApp(), // Exit the app
+            },
+          ],
+          { cancelable: false } // Prevent dismissing the alert by tapping outside
+        );
+        return true; // Prevent the default back button behavior
+      };
+  
+      BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+  
+      // Cleanup the event listener on component unmount
+      return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+    }, [])
+  )
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -199,8 +230,9 @@ export default function HomeScreen({ route, navigation }) {
       const json = await response.json();
       if (response.ok) {
         console.log("Councils loaded successfully.")
-        console.log(json)
+        //console.log(json)
         setCouncilData(json);
+        setFilteredData(json);
       } else if( response.status == 204) {
         Alert.alert('No Councils Found ')
       }
@@ -246,6 +278,18 @@ export default function HomeScreen({ route, navigation }) {
     );
   };
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (query === '') {
+      setFilteredData(councilData); // Reset to original data if search is cleared
+    } else {
+      const filtered = councilData.filter((council) =>
+        council.Name.toLowerCase().includes(query.toLowerCase()) // Search by name
+      );
+      setFilteredData(filtered);
+    }
+  };
+
   const renderCouncilCard = ({ item }) => (
     <View style={styles.cardContainer}>
       <CouncilCard council={item} navigation={navigation} member={memberId} displayPicture={item.DisplayPictureUrl}/>
@@ -263,10 +307,18 @@ export default function HomeScreen({ route, navigation }) {
         <Text style={styles.headerText}>Council</Text>
       </View>
       
+      <TextInput
+        style={styles.searchBox}
+        placeholder="Search Councils..."
+        placeholderTextColor={'black'}
+        value={searchQuery}
+        onChangeText={handleSearch}
+      />
 
       <View style={styles.contentContainer}>
         <FlatList
-          data={councilData}
+          // data={councilData}
+          data={filteredData}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderCouncilCard}
           refreshing={loading}
@@ -281,13 +333,31 @@ export default function HomeScreen({ route, navigation }) {
           contentContainerStyle={styles.listContent}
         />
       </View>
-     
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        color="#F0C38E"
-        onPress={() => navigation.navigate('JoinCouncil', { memberID: memberId })}
-      />
+      <Provider>
+      <View style={{flex: 1}}>
+      <Portal>
+          <FAB.Group
+            open={isOpen}
+            icon={isOpen ? 'close' : 'plus'} // Changes from "+" to "x" when open
+            backgroundColor="#F0C38E"
+            actions={[
+              {
+                icon: 'pencil',
+                label: 'Add New Council',
+                onPress: () => navigation.navigate('JoinCouncil', { memberID: memberId }),
+                labelStyle: { color: 'black' }, // Change the label color
+                color: 'white', // Change the icon color
+              },
+            ]}
+            onStateChange={({ open }) => setIsOpen(open)}
+            fabStyle={styles.fab}
+            backdropColor="transparent" // Removes the black background
+            style={styles.fabGroup}
+            color="#F0C38E"
+          />
+        </Portal>
+        </View>
+        </Provider>
         <FAB
         icon="dots-vertical"
         style={styles.fab3}
@@ -365,11 +435,24 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 0,
   },
+  searchBox: {
+    height: 50,
+    marginHorizontal: 15,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    color : 'black',
+    borderColor: '#ccc',
+    backgroundColor: '#fff',
+  },
   fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 90,
     backgroundColor: '#555',
+  },
+  fabGroup: {
+    position: 'absolute', // Ensures it doesn’t affect surrounding layout
+    right: 10,
+    bottom: 80,
   },
   fab1: {
     position: 'absolute',

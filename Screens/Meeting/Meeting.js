@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Text, Image, SafeAreaView, StyleSheet, TouchableOpacity, useWindowDimensions, View, FlatList, Dimensions, Modal, TextInput, Alert } from 'react-native';
+import { Text, Image, SafeAreaView, StyleSheet, TouchableOpacity, useWindowDimensions, View, FlatList, Dimensions, Modal, TextInput, Alert, KeyboardAvoidingView } from 'react-native';
 import WavyBackground from '../../Background/WavyBackground';
 import DividerLine from '../../Background/LineDivider';
 import { ActivityIndicator, FAB } from 'react-native-paper';
@@ -21,11 +21,13 @@ export default function MeetingScreen ({route, navigation}) {
   const [selectedId, setSelectedId] = useState(0)
   const [menuVisible, setMenuVisible] = useState(false);
   const openMenu = (id) => {
+    console.log('Opening menu for meeting:', id);
     setSelectedId(id); 
     setMenuVisible(true); 
   };
 
   const closeMenu = () => {
+    console.log('Closing menu');
     setSelectedId(null); 
     setMenuVisible(false); 
   };
@@ -184,7 +186,7 @@ export default function MeetingScreen ({route, navigation}) {
         animationType="fade"
         onRequestClose={closeMenu}
       >
-        <TouchableOpacity style={styles.modalOverlay}>
+        <KeyboardAvoidingView style={styles.modalOverlay}>
           <View style={styles.menuContainer}>
             {/* Modal Header with Close Button */}
             <View style={styles.headerContainer2}>
@@ -215,7 +217,7 @@ export default function MeetingScreen ({route, navigation}) {
             )}
           </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Modal>
 
           <TouchableOpacity style={styles.actionButton} onPress={() => {openMenu1(item.id)}}>
@@ -378,20 +380,20 @@ const styles = StyleSheet.create({
     borderRadius : 35,
     width: Dimensions.get('window').width - 25, 
   },
-  // card2: {
-  //   flex: 1,
-  //   marginHorizontal: 15, // Add balanced horizontal margins
-  //   backgroundColor: '#fff',
-  //   marginBottom: 15,
-  //   shadowColor: '#000', // Add a shadow for a floating card effect
-  //   shadowOpacity: 0.1,
-  //   shadowRadius: 5,
-  //   elevation: 5, // For Android shadow
-  //   padding: 10, // Add padding inside the card
-  //   height: '90%',
-  //   borderRadius : 25,
-  //   width: '90%', 
-  // },
+  card2: {
+    flex: 1,
+    marginHorizontal: 13, // Add balanced horizontal margins
+    backgroundColor: '#fff',
+    marginBottom: 15,
+    shadowColor: '#000', // Add a shadow for a floating card effect
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5, // For Android shadow
+    padding: 7, // Add padding inside the card
+    height: '90%',
+    borderRadius : 25,
+    width: '100%', 
+  },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
